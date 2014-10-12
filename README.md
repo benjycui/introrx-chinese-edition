@@ -92,3 +92,20 @@ FRP提高了代码的抽象层级，所以你可以只关注定义了业务逻�
 在这个教程中，我将会使用 **JavaScript** 和 **[RxJS](https://github.com/Reactive-Extensions/RxJS)**，因为JavaScript是现在最多人会的语言，而[Rx* 库](https://rx.codeplex.com/)有多种语言版本，并支持多种平台([.NET](https://rx.codeplex.com/), [Java](https://github.com/Netflix/RxJava), [Scala](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-scala), [Clojure](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-clojure),  [JavaScript](https://github.com/Reactive-Extensions/RxJS), [Ruby](https://github.com/Reactive-Extensions/Rx.rb), [Python](https://github.com/Reactive-Extensions/RxPy), [C++](https://github.com/Reactive-Extensions/RxCpp), [Objective-C/Cocoa](https://github.com/ReactiveCocoa/ReactiveCocoa), [Groovy](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-groovy), 等等)。所以，无论你用的是什么语言、库，你都能从下面这个教程中学到东西。
 
 ## 实现"Who to follow"推荐界面
+
+在Twitter上，这个界面看起来是这样的：
+
+![Twitter Who to follow suggestions box](http://i.imgur.com/eAlNb0j.png)
+
+我们将会重点模拟它的核心功能，如下：
+
+* 启动时从API那里加载帐户数据，并显示3个推荐
+* 点击"Refresh"时，加载另外3个推荐用户到这三行中
+* 点击帐号所在行的'x'按钮时，清除那个帐号然后显示一个新的推荐
+* 每行都会显示帐号的头像，以及他们主页的链接
+
+我们可以忽略其它的特性和按钮，因为它们是次要的。同时，因为Twitter最近关闭了对非授权用户的API，我们将会为Github实现这个推荐界面，而非Twitter。这是[Github获取用户的API](https://developer.github.com/v3/users/#get-all-users)。
+
+如果你想先看一下最终效果，这里有完成后的代码 http://jsfiddle.net/staltz/8jFJH/48/ 。
+
+## Request与response
