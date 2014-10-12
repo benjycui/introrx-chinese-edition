@@ -109,3 +109,126 @@ FRP提高了代码的抽象层级，所以你可以只关注定义了业务逻�
 如果你想先看一下最终效果，这里有完成后的代码 http://jsfiddle.net/staltz/8jFJH/48/ 。
 
 ## Request与response
+
+**在FRP中你该怎么处理这个问题呢？** 好吧，首先，(几乎)_所有的东西都可以转为一个Stream_。这就是FRP的咒语。让我们先从最简单的特性开始："在启动时，从API加载3个帐号的数据"。这并没有什么特别，就只是简单的(1)发出一个请求，(2)收到一个响应，(3)渲染这个响应。所以，让我们继续，并用Stream代表我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
+
+在启动的时候，我们只需要发出一个请求，所以如果我们把它转为一个Data stream的话，那就是一个只有一个Value的Stream。稍后，我们知道将会有多个请求发生，但现在，就只有一个请求。
+
+```
+--a------|->
+
+a是一个String 'https://api.github.com/users'
+```
+
+这是一个包含了我们想向其发出请求的URL的Stream。每当一个请求事件发生时，它会告诉我们两件事："什么时候"与"什么东西"。"什么时候"这个请求会被执行，就是什么时候这个Event会被emit。"什么东西"会被请求，就是这个emit出来的Value：一个包含URL的String。
+
+在RX*中，创建只有一个Value的Stream是非常简单的。官方把一个Stream称作Observable，因为它可以被观察(can be observed => observable)，但是我发现那是个很傻逼的名子，所以我把它叫做_Stream_。
+
+```javascript
+var requestStream = Rx.Observable.returnValue('https://api.github.com/users');
+```
+
+但是现在，那只是一个包含了String的Stream，并没有什么特别，所以我们需要以某种方式使Value被emit。就是通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个Stream。
+
+```javascript
+requestStream.subscribe(function(requestUrl) {
+  // execute the request
+  jQuery.getJSON(requestUrl, function(responseData) {
+    // ...
+  });
+}
+```
+
+留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。但先等等，FRP可以用来处理 **异步** Data stream。那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
+
+```javascript
+requestStream.subscribe(function(requestUrl) {
+  // execute the request
+  var responseStream = Rx.Observable.create(function (observer) {
+    jQuery.getJSON(requestUrl)
+    .done(function(response) { observer.onNext(response); })
+    .fail(function(jqXHR, status, error) { observer.onError(error); })
+    .always(function() { observer.onCompleted(); });
+  });
+
+  responseStream.subscribe(function(response) {
+    // do something with the response
+  });
+}
+```
+
+[`Rx.Observable.create()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablecreatesubscribe)所做的事就是通过显式的通知每一个Observer(或者说是Subscriber) Data events(`onNext()`)或者Errors (`onError()`)来创建你自己的Stream。而我们所做的就只是把jQuery Ajax Promise包装起来而已。**打扰一下，这意味者Promise本质上就是一个Observable？**
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+![Amazed](http://www.myfacewhen.net/uploads/3324-amazed-face.gif)
+
+Yes.
+
+Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.fromPromise(promise)`轻易的把一个Promise转为Observable，所以我们就这样子做吧。唯一的不同就是Observable并不遵循[Promises/A+](http://promises-aplus.github.io/promises-spec/)，但概念上没有冲突。Promise就是只有一个Value的Observable。FRP Stream比Promise更进一步的是允许返回多个Value。
+
+这样非常不错，并展现了FRP至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下FRP能胜任些什么。
+
+现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前听到的那样，在FRP内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样子做。
+
+你现在需要知道的一个基本的函数是[`map(f)`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemapselector-thisarg)，它分别把`f()`应用到Stream A中的每一个Value，并把返回的Value放进Stream B里。如果我们也对Request Stream与Response Stream进行同样的处理，我们可以把Request URL映射(map)为Response Promise(可以转为Streams)。
+
+```javascript
+var responseMetastream = requestStream
+  .map(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+```
+
+然后，我们将会创造一个叫做"_Metastream_"的怪物：包含Stream的Stream。暂时不需要害怕。Metastream就是emit的每个Value都是Stream的Stream。你可以把它想像为[指针(Pointer)](https://en.wikipedia.org/wiki/Pointer_(computer_programming))：每个Value都是一个指向其它Stream的指针。在我们的例子里，每个Request URL都会被映射(map)为一个指向包含响应Promise stream的指针。
+
+![Response metastream](http://i.imgur.com/HHnmlac.png)
+
+Response的Metastream看起来会让人困惑，并且看起来也没有帮到我们什么。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，通过把应用到"trunk" Stream上的所有操作都应用到"branch" Stream上，可以"flatten" Metastream。Flatmap并不是用来"fix" Metastream的，因为Metastream也不是一个Bug，这只是一些用来处理FRP中的异步响应(Asynchronous response)的工具。
+
+```javascript
+var responseStream = requestStream
+  .flatMap(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+```
+
+![Response stream](http://i.imgur.com/Hi3zNzJ.png)
+
+很好。因为Response stream是根据Request stream定义的，所以**如果**我们后面在Request stream上发起更多的请求的话，在Response stream上我们将会得到相应的Response event，就像预期的那样：
+
+```
+requestStream:  --a-----b--c------------|->
+responseStream: -----A--------B-----C---|->
+
+(小写字母是一个Request，大写字母是对应的Response)
+```
+
+现在，我们终于有了一个Response stream，所以可以把收到的数据渲染出来了：
+
+```javascript
+responseStream.subscribe(function(response) {
+  // render `response` to the DOM however you wish
+});
+```
+
+把目前为止所有的代码放到一起就是这样：
+
+```javascript
+var requestStream = Rx.Observable.returnValue('https://api.github.com/users');
+
+var responseStream = requestStream
+  .flatMap(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+
+responseStream.subscribe(function(response) {
+  // render `response` to the DOM however you wish
+});
+```
+
+## Refresh按钮
