@@ -42,7 +42,7 @@ Stream就是一个 **按时间排序的Events(Ongoing events ordered in time)序
 
 通过分别为Value、Error、"Completed"定义事件处理函数，我们将会异步地捕获这些Events。有时可以忽略Error与"Completed"，你只需要定义Value的事件处理函数就行。监听一个Stream也被称作是 **订阅(Subscribing)**，而我们所定义的函数就是观察者(Observer)，Stream则是被观察者(Observable)，其实就是[观察者模式(Observer Design Pattern)](https://en.wikipedia.org/wiki/Observer_pattern)。
 
-上面的示意图也可以使用ASCII重画为下图，在下面的部分教程中我们会使用下图：
+上面的示意图也可以使用ASCII重画为下图，在下面的部分教程中我们会使用这幅图：
 
 ```
 --a---b-c---d---X---|->
@@ -76,3 +76,11 @@ counterStream: ---1----2--3----4------5-->
 灰色的方框是用来转换Stream的函数。首先，我们把连续250ms内的Click都放进一个列表(原文："First we accumulate clicks in lists, whenever 250 milliseconds of "event silence" has happened." 实在不知道怎么翻译，就按自己的理解写了一下) -- 简单来说就是`buffer(stream.throttle(250ms))`做的事，不要在意这些细节，我们只是展示一下FRP而已。结果是一个列表的Stream，然后我们使用`map()`把每个列表映射为一个整数，即它的长度。最终，我们使用`filter(x >= 2)`把整数`1`给过滤掉。就这样，3个操作就生成了我们想要的Stream。然后我们就可以订阅(监听)这个Stream，并以我们所希望的方式作出反应。
 
 我希望你能感受到这个示例的优美之处。这个示例只是冰山一角：你可以把同样的操作应用到不同种类的Stream上，例如，一个API响应的Stream；另一方面，还有很多其它可用的函数。
+
+## 为什么我要使用FRP
+
+FRP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑的那些相互依赖的事件，而非纠缠于大量的实现细节。FRP的代码往往会更加简明。
+
+特别是在开发现在这些有着大量与Data events相关的UI events的高互动性Webapps、Mobile apps的时候，FRP的优势更加明显。10年前，网页的交互就只是提交一个很长的表单到后端，而前端只有简单的渲染。Apps就表现得更加的实时了：修改一个表单域就能自动地把修改后的值保存到后端，为一些内容"点赞"时，会实时的反应到其它在线用户那里等等。
+
+现在的Apps有着大量各种各样的实时Events，以给用户提供一个交互性较高的体验。我们需要工具去应对这个变化，而FRP就是一个答案。
