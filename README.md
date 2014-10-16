@@ -553,3 +553,13 @@ suggestion1Stream.subscribe(function(suggestion) {
 留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在FRP中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的Stream函数，甚至更多类似的函数去控制一个事件驱动(Event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
 
 ## 下一步
+
+如果你觉得Rx*会成为你首选的FRP库，花点时间去熟悉这个[函数列表](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md)，包括了如何转换(trancform)、合并(combine)、以及创建Observable。如果你想通过图表去理解这些函数，看一下这份[RxJava's very useful documentation with marble diagrams](https://github.com/Netflix/RxJava/wiki/Creating-Observables)。无论什么时候你遇到问题，画一下这些图，思考一下，看一下这一大串函数，然后继续思考。以我个人经验，这样效果很明显。
+
+一旦你开始使用Rx*去编程，很有必要去理解[Cold vs Hot Observables](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md#cold-vs-hot-observables)中的概念。如果忽略了这些，你一不小心就会被它坑了。我提醒过你了。通过学习真正的函数式编程(Funational programming)去提升自己的技能，并熟悉那些会影响到Rx*的问题，比如副作用(Side effects)。
+
+但是FRP不仅仅有Rx*。还有相对容易理解的[Bacon.js](http://baconjs.github.io/)，它没有Rx*那些怪癖。[Elm Language](http://elm-lang.org/)则以它自己的方式支持FRP：它是一门会编译成Javascript + HTML + CSS的FRP**语言**，并有一个[Time travelling debugger](http://debug.elm-lang.org/)。非常NB。
+
+FRP在需要处理大量事件的Frontend和Apps中非常有用。但它不仅仅能用在客户端，在Backend或者与Database交互时也非常有用。事实上，[RxJava是实现Netflix's API服务器端并发的一个重要组件](http://techblog.netflix.com/2013/02/rxjava-netflix-api.html)。FRP并不是一个只能在某种应用或者语言中使用的Framework。它本质上是一个在开发任何Event-driven软件中都能使用的编程范式(Paradigm)。
+
+如果这份教程能帮到你，[请与更多人分享](https://twitter.com/intent/tweet?original_referer=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754%2F&amp;text=The%20introduction%20to%20Reactive%20Programming%20you%27ve%20been%20missing&amp;tw_p=tweetbutton&amp;url=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754&amp;via=andrestaltz)。
