@@ -499,3 +499,57 @@ var suggestion1Stream = close1ClickStream.startWith('startup click') // we added
   )
   .startWith(null);
 ```
+
+## 总结
+
+终于完成了，所有的代码合在一起是这样子：
+
+```javascript
+var refreshButton = document.querySelector('.refresh');
+var refreshClickStream = Rx.Observable.fromEvent(refreshButton, 'click');
+
+var closeButton1 = document.querySelector('.close1');
+var close1ClickStream = Rx.Observable.fromEvent(closeButton1, 'click');
+// and the same logic for close2 and close3
+
+var requestStream = refreshClickStream.startWith('startup click')
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+
+var responseStream = requestStream
+  .flatMap(function (requestUrl) {
+    return Rx.Observable.fromPromise($.ajax({url: requestUrl}));
+  });
+
+var suggestion1Stream = close1ClickStream.startWith('startup click')
+  .combineLatest(responseStream,
+    function(click, listUsers) {
+      return listUsers[Math.floor(Math.random()*listUsers.length)];
+    }
+  )
+  .merge(
+    refreshClickStream.map(function(){ return null; })
+  )
+  .startWith(null);
+// and the same logic for suggestion2Stream and suggestion3Stream
+
+suggestion1Stream.subscribe(function(suggestion) {
+  if (suggestion === null) {
+    // hide the first suggestion DOM element
+  }
+  else {
+    // show the first suggestion DOM element
+    // and render the data
+  }
+});
+```
+
+**你可以查看这个最终效果 http://jsfiddle.net/staltz/8jFJH/48/**
+
+这段代码虽然短小，但实现了不少功能：它适当的使用Separation of concerns实现了对Multiple events的管理，甚至缓存了响应。函数式的风格让代码看起来更加Declarative而非Imperative：我们并非给出一组指令去执行，而是通过定义Stream之间的关系 **定义这是什么**。举个例子，我们使用FRP告诉计算机 _`suggestion1Stream` **是** 由 'close 1' Stream与最新响应中的一个用户合并(combine)而来，在程序刚运行或者刷新时则是`null`_。
+
+留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在FRP中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的Stream函数，甚至更多类似的函数去控制一个事件驱动(Event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
+
+## 下一步
