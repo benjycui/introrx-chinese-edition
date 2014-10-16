@@ -232,3 +232,95 @@ responseStream.subscribe(function(response) {
 ```
 
 ## Refresh按钮
+
+我之前并没有提到返回的JSON是一个有着100个用户数据的列表。因为这个API只允许我们设置偏移量(Offset)，而无法设置返回的用户数，所以我们现在是只用了3个用户的数据而浪费了另外97个的数据。这个问题暂时可以忽略，稍后我们会学习怎么缓存这些数据。
+
+每点击一次Refresh按钮，Request stream就会emit一个新的URL，同时也会返回一个新的Response。我们需要两样东西：一个是Refresh按钮上Click events组成的Stream(咒语：一切皆Stream)，而Request stream将改为随Refresh click stream作出反应。幸运的是，RxJS提供了从Event listener生成Observable的函数。
+
+```javascript
+var refreshButton = document.querySelector('.refresh');
+var refreshClickStream = Rx.Observable.fromEvent(refreshButton, 'click');
+```
+
+既然Refresh click event本身并没有提供任何要请求的API URL，我们需要把每一次的Click都映射为一个URL。现在，我们把Refresh click stream映射为新的Request stream，其中每一个Click都分别映射为对API请求一个随机偏移量的URL。
+
+```javascript
+var requestStream = refreshClickStream
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+```
+
+因为我比较笨并且也没有使用自动化测试，所以我刚把之前做好的一个特性搞烂了。现在在启动时不会再发出任何的Request，而只有在点击Refresh按钮时才会。额...这两个行为我都需要：无论是点击Refresh按钮时还是刚打开页面时都该发出一个Request。
+
+我们知道怎么分别为这两种情况生成Stream：
+
+```javascript
+var requestOnRefreshStream = refreshClickStream
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+
+var startupRequestStream = Rx.Observable.returnValue('https://api.github.com/users');
+```
+
+但我们怎样才能把这两个"合成(merge)"一个呢？好吧，有[`merge()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemergemaxconcurrent--other)函数。这就是它做的事的图解：
+
+```
+stream A: ---a--------e-----o----->
+stream B: -----B---C-----D-------->
+          vvvvvvvvv merge vvvvvvvvv
+          ---a-B---C--e--D--o----->
+```
+
+这样就简单了：
+
+```javascript
+var requestOnRefreshStream = refreshClickStream
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+
+var startupRequestStream = Rx.Observable.returnValue('https://api.github.com/users');
+
+var requestStream = Rx.Observable.merge(
+  requestOnRefreshStream, startupRequestStream
+);
+```
+
+还有一个更加干净的可选方案，不需要使用中间变量。
+
+```javascript
+var requestStream = refreshClickStream
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  })
+  .merge(Rx.Observable.returnValue('https://api.github.com/users'));
+```
+
+甚至可以更短，更具有可读性：
+
+```javascript
+var requestStream = refreshClickStream
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  })
+  .startWith('https://api.github.com/users');
+```
+
+[`startWith()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypestartwithscheduler-args)函数做的事和你预期的完全一样。无论你输入的Stream是怎样，`startWith(x)`输出的Stream一开始都是`x`。但是还不够[DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself)，我重复了API URL。一个改进的方法是移掉`refreshClickStream`最后的`startWith()`，并在一开始的时候"emulate"一次Click。
+
+```javascript
+var requestStream = refreshClickStream.startWith('startup click')
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+```
+
+很好。如果你把之前我"搞烂了的版本"的代码和现在的相比，就会发现唯一的不同是加了`startWith()`函数。
