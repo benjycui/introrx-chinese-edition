@@ -1,4 +1,4 @@
-# FRP介绍
+# FRP入门
 
 作者：[@andrestaltz](https://twitter.com/andrestaltz)
 
@@ -324,3 +324,178 @@ var requestStream = refreshClickStream.startWith('startup click')
 ```
 
 很好。如果你把之前我"搞烂了的版本"的代码和现在的相比，就会发现唯一的不同是加了`startWith()`函数。
+
+## 用streams构建三个推荐
+
+到现在为止，我们只是谈及了这个_推荐_UI元素在responeStream的`subscribe()`执行的渲染步骤。对于refresh按钮，我们还有一个问题：当你点击`refresh`时，当前存在的三个推荐是还未被清理掉的。新的推荐会在response到达后出现，为了让UI看起来舒服一些，当点击刷新时，我们需要清理掉当前的推荐。
+
+```javascript
+refreshClickStream.subscribe(function() {
+  // clear the 3 suggestion DOM elements
+});
+```
+
+不，别那么快，朋友。这样不好，我们现在有**两个**subscribers会影响到推荐的DOM元素（另外一个是`responseStream.subscribe()`），而且这样在[Separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)上也做得不好。还记得FRP的咒语么？
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+![Mantra](http://i.imgur.com/AIimQ8C.jpg)
+
+所以让我们把显示的推荐设计成emitted的值为一个包含了推荐内容的JSON对象的stream。我们以此把三个推荐内容分开来。现在第一个推荐看起来是这样子的：
+
+```javascript
+var suggestion1Stream = responseStream
+  .map(function(listUsers) {
+    // get one random user from the list
+    return listUsers[Math.floor(Math.random()*listUsers.length)];
+  });
+```
+
+其他的，`suggestion2Stream`和`suggestion3Stream`可以简单的拷贝`suggestion·Stream`的代码来使用。这不是DRY，它会让我们的例子变得更加简单一些，加之我觉得这是一个可以帮助考虑如何减少重复的良好实践。
+
+我们不在responseStream的subscribe()中处理渲染了，我们这么处理：
+
+```javascript
+suggestion1Stream.subscribe(function(suggestion) {
+  // render the 1st suggestion to the DOM
+});
+```
+回到"当刷新时，清理现有建议"，我们可以很简单的把刷新点击映射到`null`的推荐数据上，并且在`suggestion1Stream`中包含进来，如下：
+
+```javascript
+var suggestion1Stream = responseStream
+  .map(function(listUsers) {
+    // get one random user from the list
+    return listUsers[Math.floor(Math.random()*listUsers.length)];
+  })
+  .merge(
+    refreshClickStream.map(function(){ return null; })
+  );
+```
+
+当渲染时，`null`解释为"没有数据"，所以把UI元素隐藏起来。
+
+```javascript
+suggestion1Stream.subscribe(function(suggestion) {
+  if (suggestion === null) {
+    // hide the first suggestion DOM element
+  }
+  else {
+    // show the first suggestion DOM element
+    // and render the data
+  }
+});
+```
+
+现在的大图长这样：
+
+```
+refreshClickStream: ----------o--------o---->
+     requestStream: -r--------r--------r---->
+    responseStream: ----R---------R------R-->
+ suggestion1Stream: ----s-----N---s----N-s-->
+ suggestion2Stream: ----q-----N---q----N-q-->
+ suggestion3Stream: ----t-----N---t----N-t-->
+```
+
+`N`即代表了`null`
+
+作为一种补充，我们也可以在一开始的时候就渲染空的推荐内容。这通过把`startWith(null)`添加到suggestion streams就完成了：
+
+```javascript
+var suggestion1Stream = responseStream
+  .map(function(listUsers) {
+    // get one random user from the list
+    return listUsers[Math.floor(Math.random()*listUsers.length)];
+  })
+  .merge(
+    refreshClickStream.map(function(){ return null; })
+  )
+  .startWith(null);
+```
+
+现在结果是：
+
+```
+refreshClickStream: ----------o---------o---->
+     requestStream: -r--------r---------r---->
+    responseStream: ----R----------R------R-->
+ suggestion1Stream: -N--s-----N----s----N-s-->
+ suggestion2Stream: -N--q-----N----q----N-q-->
+ suggestion3Stream: -N--t-----N----t----N-t-->
+```
+
+## 关闭推荐和使用缓存的response
+
+还有剩下来一个功能需要实现。每一个建议，都应该有自己的“X”按钮关闭它，然后在该位置加载另一个。第一个想到的，是点击任何关闭按钮时都需要发起一个新的请求：
+
+```javascript
+var close1Button = document.querySelector('.close1');
+var close1ClickStream = Rx.Observable.fromEvent(close1Button, 'click');
+// and the same for close2Button and close3Button
+
+var requestStream = refreshClickStream.startWith('startup click')
+  .merge(close1ClickStream) // we added this
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+```
+
+这个没有效果。这将会关闭并且重新加之_所有_的推荐，而不是仅仅处理我们点击的那一个。有一些不一样的方法可以解决，并且让它变得更加有趣，我们可以通过复用之前的请求来解决它。整个API的response页面大小为100个用户，而我们仅仅使用其中的三个，所以还有很多的新数据可以使用，无须重新发起请求。
+
+同样的，我们用streams的方式来思考。当'close1'点击事件触发时，我们想要使用在responseStream上的_最近的emitted_ response来从列表中获取一个随机的用户，如：
+
+```
+    requestStream: --r--------------->
+   responseStream: ------R----------->
+close1ClickStream: ------------c----->
+suggestion1Stream: ------s-----s----->
+```
+
+在RX*中有可以一个合并的方法称为[`combineLatest`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypecombinelatestargs-resultselector)，这像是我们需要的。它接受两个streams A和B作为输入，当其中一个stream emit一个值时，`combineLatest`把最近两个emitted的值`a`和`b`从各自的streams中取出并且返回一个`c = f(x,y)`，`f`为你定义的函数。用图来表示更好：
+
+```
+stream A: --a-----------e--------i-------->
+stream B: -----b----c--------d-------q---->
+          vvvvvvvv combineLatest(f) vvvvvvv
+          ----AB---AC--EC---ED--ID--IQ---->
+
+这个的f是把值转化成大写的函数
+where f is the uppercase function
+```
+
+我们可以在`close1ClickStream`和`responseStream`上使用combineLatest()，所以无论什么时候当一个按钮被点击时，我们可以拿到最后的response emitted并且在`suggestion1Stream`上获得一个新的值。另一方面，combineLatest()是对称的，当一个新的response 在`responseStream` emited时，它将会把最后的'关闭 1'的点击事件一起合并来产生一个新的推荐。这是有趣的，因为它允许我们把之前的`suggestion1Stream`代码简化成下边这个样子：
+
+```javascript
+var suggestion1Stream = close1ClickStream
+  .combineLatest(responseStream,
+    function(click, listUsers) {
+      return listUsers[Math.floor(Math.random()*listUsers.length)];
+    }
+  )
+  .merge(
+    refreshClickStream.map(function(){ return null; })
+  )
+  .startWith(null);
+```
+
+还有一个问题需要解决。combineLatest()使用最近的两个数据源，但是当其中一个来源没发起任何事件时，combineLatest()无法在output stream中产生一个数据事件。从上边的ASCII图中，你可以看到，在第一个stream emitted `a`这个值时并没有任何输出产生，只有当第二个stream emiited `b`时有输出值。
+
+有多种方法可以解决这个问题，我们选择最简单的一种，一开始在'close 1'按钮上模拟一个点击事件：
+
+```javascript
+var suggestion1Stream = close1ClickStream.startWith('startup click') // we added this
+  .combineLatest(responseStream,
+    function(click, listUsers) {
+      return listUsers[Math.floor(Math.random()*listUsers.length)];
+    }
+  )
+  .merge(
+    refreshClickStream.map(function(){ return null; })
+  )
+  .startWith(null);
+```
