@@ -2,7 +2,7 @@
 
 作者：[@andrestaltz](https://twitter.com/andrestaltz)
 
-翻译：[@benjycui](https://github.com/benjycui)
+翻译：[@benjycui](https://github.com/benjycui)、[@jsenjoy](https://github.com/jsenjoy)
 
 > [原文](https://github.com/benjycui/introrx-chinese-edition/blob/master/introrx.md)
 
