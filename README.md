@@ -4,7 +4,7 @@
 
 翻译：[@benjycui](https://github.com/benjycui)、[@jsenjoy](https://github.com/jsenjoy)
 
-> [原文](https://github.com/benjycui/introrx-chinese-edition/blob/master/introrx.md)
+> 作者在[原文](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)后回答了不少人的疑惑，推荐一看。
 
 > 在翻译时，术语我尽量不翻译，就算翻译了也会给出原文以作对照。因为就个人观察的情况而言，术语翻译难以统一，不同的译者会把同一个概念翻译成不同的版本，最终只会让读者困惑。而且术语往往就几个单词，记起来也不难。
 
