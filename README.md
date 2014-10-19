@@ -1,4 +1,4 @@
-# FRP入门
+# RP入门
 
 作者：[@andrestaltz](https://twitter.com/andrestaltz)
 
@@ -8,9 +8,9 @@
 
 > 在翻译时，术语我尽量不翻译，就算翻译了也会给出原文以作对照。因为就个人观察的情况而言，术语翻译难以统一，不同的译者会把同一个概念翻译成不同的版本，最终只会让读者困惑。而且术语往往就几个单词，记起来也不难。
 
-很明显你是有兴趣学习这种被称作FRP(Functional Reactive Programming)的新技术才来看这篇文章的。
+很明显你是有兴趣学习这种被称作RP(Reactive Programming)的新技术才来看这篇文章的。
 
-学习FRP是很困难的一个过程，特别是在缺乏优秀资料的前提下。刚开始学习时，我试过去找一些教程，并找到了为数不多的实用教程，但是它们都流于表面，从没有围绕FRP构建起一个完整的知识体系。库的文档往往也无法帮助你去了解它的函数。不信的话可以看一下这个：
+学习RP是很困难的一个过程，特别是在缺乏优秀资料的前提下。刚开始学习时，我试过去找一些教程，并找到了为数不多的实用教程，但是它们都流于表面，从没有围绕RP构建起一个完整的知识体系。库的文档往往也无法帮助你去了解它的函数。不信的话可以看一下这个：
 
 > **Rx.Observable.prototype.flatMapLatest(selector, [thisArg])**
 
@@ -18,23 +18,23 @@
 
 尼玛。
 
-我看过两本书，一本只是讲述了一些概念，而另一本则纠结于如何使用FRP库。我最终放弃了这种痛苦的学习方式，决定在开发中一边使用FRP，一边理解它。在[Futurice](https://www.futurice.com)工作期间，我尝试在真实项目中使用FRP，并且当我遇到困难时，得到了[同事们的帮助](http://blog.futurice.com/top-7-tips-for-rxjava-on-android)。
+我看过两本书，一本只是讲述了一些概念，而另一本则纠结于如何使用RP库。我最终放弃了这种痛苦的学习方式，决定在开发中一边使用RP，一边理解它。在[Futurice](https://www.futurice.com)工作期间，我尝试在真实项目中使用RP，并且当我遇到困难时，得到了[同事们的帮助](http://blog.futurice.com/top-7-tips-for-rxjava-on-android)。
 
-在学习过程中最困难的一部分是 **以FRP的方式思考**。这意味着要放弃命令式且带状态的(Imperative and stateful)编程习惯，并且要强迫你的大脑以一种不同的方式去工作。在互联网上我找不到任何关于这方面的教程，而我觉得这世界需要一份关于怎么以FRP的方式思考的实用教程，这样你就有足够的资料去起步。库的文档无法为你的学习提供指引，而我希望这篇文章可以。
+在学习过程中最困难的一部分是 **以RP的方式思考**。这意味着要放弃命令式且带状态的(Imperative and stateful)编程习惯，并且要强迫你的大脑以一种不同的方式去工作。在互联网上我找不到任何关于这方面的教程，而我觉得这世界需要一份关于怎么以RP的方式思考的实用教程，这样你就有足够的资料去起步。库的文档无法为你的学习提供指引，而我希望这篇文章可以。
 
-## 什么是FRP?
+## 什么是RP?
 
 在互联网上有着一大堆糟糕的解释与定义。[维基百科](https://en.wikipedia.org/wiki/Functional_reactive_programming)一如既往的空泛与理论化。[Stackoverflow](http://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming)的权威答案明显不适合初学者。[Reactive Manifesto](http://www.reactivemanifesto.org/)看起来是你展示给你公司的项目经理或者老板们看的东西。微软的[Rx terminology](https://rx.codeplex.com/) "Rx = Observables + LINQ + Schedulers" 过于重量级且微软味十足，只会让大部分人困惑。相对于你所使用的MV*框架以及钟爱的编程语言，"Reactive"和"Propagation of change"这些术语并没有传达任何有意义的概念。框架的Views层当然要对Models层作出反应，改变当然会传播(分别对应上文的"Reactive"与"Propagation of change"，意思是这一大堆术语和废话差不多，翻译不好，只能靠备注了)。如果没有这些，就没有东西会被渲染了。
 
 所以不要再扯这些废话了。
 
-### FRP是使用异步数据流进行编程
+### RP是使用异步数据流进行编程
 
-一方面，这并不是什么新东西。Event buses或者Click events本质上就是异步事件流(Asynchronous event stream)，你可以监听并处理这些事件。FRP的思路大概如下：你可以用包括Click和Hover事件在内的任何东西创建Data stream(原文："FRP is that idea on steroids. You are able to create data streams of anything, not just from click and hover events.")。Stream廉价且常见，任何东西都可以是一个Stream：变量、用户输入、属性、Cache、数据结构等等。举个例子，想像一下你的Twitter feed就像是Click events那样的Data stream，你可以监听它并相应的作出响应。
+一方面，这并不是什么新东西。Event buses或者Click events本质上就是异步事件流(Asynchronous event stream)，你可以监听并处理这些事件。RP的思路大概如下：你可以用包括Click和Hover事件在内的任何东西创建Data stream(原文："FRP is that idea on steroids. You are able to create data streams of anything, not just from click and hover events.")。Stream廉价且常见，任何东西都可以是一个Stream：变量、用户输入、属性、Cache、数据结构等等。举个例子，想像一下你的Twitter feed就像是Click events那样的Data stream，你可以监听它并相应的作出响应。
 
 **在这个基础上，你还有令人惊艳的函数去combine、create、filter这些Stream。**这就是函数式(Functional)魔法的用武之地。Stream能接受一个，甚至多个Stream为输入。你可以_merge_两个Stream，也可以从一个Stream中_filter_出你感兴趣的Events以生成一个新的Stream，还可以把一个Stream中的Data values _map_到一个新的Stream中。
 
-既然Stream在FRP中如此重要，那么我们就应该好好的了解它们，就从我们熟悉的"Clicks on a button" Event stream开始。
+既然Stream在RP中如此重要，那么我们就应该好好的了解它们，就从我们熟悉的"Clicks on a button" Event stream开始。
 
 ![Click event stream](http://i.imgur.com/cL4MOsS.png)
 
@@ -53,9 +53,9 @@ X is an error
 ---> is the timeline
 ```
 
-既然已经开始对FRP感到熟悉，为了不让你觉得无聊，我们可以尝试做一些新东西：我们将会把一个Click event stream转为新的Click event stream。
+既然已经开始对RP感到熟悉，为了不让你觉得无聊，我们可以尝试做一些新东西：我们将会把一个Click event stream转为新的Click event stream。
 
-首先，让我们做一个能记录一个按钮点击了多少次的计数器Stream。在常见的FRP库中，每个Stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的Click stream返回一个 **新的Stream**。它不会对原来的Click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于FRP Stream，就如果汁之于薄煎饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
+首先，让我们做一个能记录一个按钮点击了多少次的计数器Stream。在常见的RP库中，每个Stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的Click stream返回一个 **新的Stream**。它不会对原来的Click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于RP Stream，就如果汁之于薄煎饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
 
 ```
   clickStream: ---c----c--c----c------c-->
@@ -67,27 +67,27 @@ counterStream: ---1----2--3----4------5-->
 
 `map(f)`会根据你提供的`f`函数把原Stream中的Value分别映射到新的Stream中。在我们的例子中，我们把每一次Click都映射为数字1。`scan(g)`会根据你提供的`g`函数把Stream中的所有Value聚合成一个Value -- `x = g(accumulated, current)`，这个示例中`g`只是一个简单的add函数。然后，每Click一次，`counterStream`就会把点击的总次数发给它的观察者。
 
-为了展示FRP真正的实力，让我们假设你想得到一个包含双击事件的Stream。为了让它更加有趣，假设我们想要的这个Stream要同时考虑三击(Triple clicks)，或者更加宽泛，连击(Multiple clicks)。深呼吸一下，然后想像一下在传统的命令式且带状态的方式中你会怎么实现。我敢打赌代码会像一堆乱麻，并且会使用一些的变量保存状态，同时也有一些计算时间间隔的代码。
+为了展示RP真正的实力，让我们假设你想得到一个包含双击事件的Stream。为了让它更加有趣，假设我们想要的这个Stream要同时考虑三击(Triple clicks)，或者更加宽泛，连击(Multiple clicks)。深呼吸一下，然后想像一下在传统的命令式且带状态的方式中你会怎么实现。我敢打赌代码会像一堆乱麻，并且会使用一些的变量保存状态，同时也有一些计算时间间隔的代码。
 
-而在FRP中，这个功能的实现就非常简单。事实上，这逻辑只有[4行代码](http://jsfiddle.net/staltz/4gGgs/27/)。但现在我们先不管那些代码。用图表的方式思考是理解怎样构建Stream的最好方法，无论你是初学者还是专家。
+而在RP中，这个功能的实现就非常简单。事实上，这逻辑只有[4行代码](http://jsfiddle.net/staltz/4gGgs/27/)。但现在我们先不管那些代码。用图表的方式思考是理解怎样构建Stream的最好方法，无论你是初学者还是专家。
 
 ![Multiple clicks stream](http://i.imgur.com/HMGWNO5.png)
 
-灰色的方框是用来转换Stream的函数。首先，我们把连续250ms内的Click都放进一个列表(原文："First we accumulate clicks in lists, whenever 250 milliseconds of "event silence" has happened." 实在不知道怎么翻译，就按自己的理解写了一下) -- 简单来说就是`buffer(stream.throttle(250ms))`做的事，不要在意这些细节，我们只是展示一下FRP而已。结果是一个列表的Stream，然后我们使用`map()`把每个列表映射为一个整数，即它的长度。最终，我们使用`filter(x >= 2)`把整数`1`给过滤掉。就这样，3个操作就生成了我们想要的Stream。然后我们就可以订阅(监听)这个Stream，并以我们所希望的方式作出反应。
+灰色的方框是用来转换Stream的函数。首先，我们把连续250ms内的Click都放进一个列表(原文："First we accumulate clicks in lists, whenever 250 milliseconds of "event silence" has happened." 实在不知道怎么翻译，就按自己的理解写了一下) -- 简单来说就是`buffer(stream.throttle(250ms))`做的事，不要在意这些细节，我们只是展示一下RP而已。结果是一个列表的Stream，然后我们使用`map()`把每个列表映射为一个整数，即它的长度。最终，我们使用`filter(x >= 2)`把整数`1`给过滤掉。就这样，3个操作就生成了我们想要的Stream。然后我们就可以订阅(监听)这个Stream，并以我们所希望的方式作出反应。
 
 我希望你能感受到这个示例的优美之处。这个示例只是冰山一角：你可以把同样的操作应用到不同种类的Stream上，例如，一个API响应的Stream；另一方面，还有很多其它可用的函数。
 
-## 为什么我要使用FRP
+## 为什么我要使用RP
 
-FRP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑的那些相互依赖的事件，而非纠缠于大量的实现细节。FRP的代码往往会更加简明。
+RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑的那些相互依赖的事件，而非纠缠于大量的实现细节。RP的代码往往会更加简明。
 
-特别是在开发现在这些有着大量与Data events相关的UI events的高互动性Webapps、Mobile apps的时候，FRP的优势将更加明显。10年前，网页的交互就只是提交一个很长的表单到后端，而前端只有简单的渲染。Apps就表现得更加的实时了：修改一个表单域就能自动地把修改后的值保存到后端，为一些内容"点赞"时，会实时的反应到其它在线用户那里等等。
+特别是在开发现在这些有着大量与Data events相关的UI events的高互动性Webapps、Mobile apps的时候，RP的优势将更加明显。10年前，网页的交互就只是提交一个很长的表单到后端，而前端只有简单的渲染。Apps就表现得更加的实时了：修改一个表单域就能自动地把修改后的值保存到后端，为一些内容"点赞"时，会实时的反应到其它在线用户那里等等。
 
-现在的Apps有着大量各种各样的实时Events，以给用户提供一个交互性较高的体验。我们需要工具去应对这个变化，而FRP就是一个答案。
+现在的Apps有着大量各种各样的实时Events，以给用户提供一个交互性较高的体验。我们需要工具去应对这个变化，而RP就是一个答案。
 
-## 以FRP方式思考的例子
+## 以RP方式思考的例子
 
-让我们做一些实践。一个真实的例子一步一步的指导我们以FRP的方式思考。不是虚构的例子，也没有只解释了一半的概念。学完教程之后，我们将写出真实可用的代码，并做到知其然，知其所以然。
+让我们做一些实践。一个真实的例子一步一步的指导我们以RP的方式思考。不是虚构的例子，也没有只解释了一半的概念。学完教程之后，我们将写出真实可用的代码，并做到知其然，知其所以然。
 
 在这个教程中，我将会使用 **JavaScript** 和 **[RxJS](https://github.com/Reactive-Extensions/RxJS)**，因为JavaScript是现在最多人会的语言，而[Rx* 库](https://rx.codeplex.com/)有多种语言版本，并支持多种平台([.NET](https://rx.codeplex.com/), [Java](https://github.com/Netflix/RxJava), [Scala](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-scala), [Clojure](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-clojure),  [JavaScript](https://github.com/Reactive-Extensions/RxJS), [Ruby](https://github.com/Reactive-Extensions/Rx.rb), [Python](https://github.com/Reactive-Extensions/RxPy), [C++](https://github.com/Reactive-Extensions/RxCpp), [Objective-C/Cocoa](https://github.com/ReactiveCocoa/ReactiveCocoa), [Groovy](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-groovy), 等等)。所以，无论你用的是什么语言、库，你都能从下面这个教程中学到东西。
 
@@ -110,7 +110,7 @@ FRP提高了代码的抽象层级，所以你可以只关注定义了业务逻�
 
 ## Request与response
 
-**在FRP中你该怎么处理这个问题呢？** 好吧，首先，(几乎)_所有的东西都可以转为一个Stream_。这就是FRP的咒语。让我们先从最简单的特性开始："在启动时，从API加载3个帐号的数据"。这并没有什么特别，就只是简单的(1)发出一个请求，(2)收到一个响应，(3)渲染这个响应。所以，让我们继续，并用Stream代表我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
+**在RP中你该怎么处理这个问题呢？** 好吧，首先，(几乎)_所有的东西都可以转为一个Stream_。这就是RP的咒语。让我们先从最简单的特性开始："在启动时，从API加载3个帐号的数据"。这并没有什么特别，就只是简单的(1)发出一个请求，(2)收到一个响应，(3)渲染这个响应。所以，让我们继续，并用Stream代表我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
 
 在启动的时候，我们只需要发出一个请求，所以如果我们把它转为一个Data stream的话，那就是一个只有一个Value的Stream。稍后，我们知道将会有多个请求发生，但现在，就只有一个请求。
 
@@ -139,7 +139,7 @@ requestStream.subscribe(function(requestUrl) {
 }
 ```
 
-留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。但先等等，FRP可以用来处理 **异步** Data stream。那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
+留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。但先等等，RP可以用来处理 **异步** Data stream。那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
 
 ```javascript
 requestStream.subscribe(function(requestUrl) {
@@ -169,11 +169,11 @@ requestStream.subscribe(function(requestUrl) {
 
 Yes.
 
-Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.fromPromise(promise)`轻易的把一个Promise转为Observable，所以我们就这样子做吧。唯一的不同就是Observable并不遵循[Promises/A+](http://promises-aplus.github.io/promises-spec/)，但概念上没有冲突。Promise就是只有一个Value的Observable。FRP Stream比Promise更进一步的是允许返回多个Value。
+Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.fromPromise(promise)`轻易的把一个Promise转为Observable，所以我们就这样子做吧。唯一的不同就是Observable并不遵循[Promises/A+](http://promises-aplus.github.io/promises-spec/)，但概念上没有冲突。Promise就是只有一个Value的Observable。RP Stream比Promise更进一步的是允许返回多个Value。
 
-这样非常不错，并展现了FRP至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下FRP能胜任些什么。
+这样非常不错，并展现了RP至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下RP能胜任些什么。
 
-现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在FRP内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样子做。
+现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在RP内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样子做。
 
 你现在需要知道的一个基本的函数是[`map(f)`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemapselector-thisarg)，它分别把`f()`应用到Stream A中的每一个Value，并把返回的Value放进Stream B里。如果我们也对Request Stream与Response Stream进行同样的处理，我们可以把Request URL映射(map)为Response Promise(而Promise可以转为Streams)。
 
@@ -188,7 +188,7 @@ var responseMetastream = requestStream
 
 ![Response metastream](http://i.imgur.com/HHnmlac.png)
 
-Response的Metastream看起来会让人困惑，并且看起来也没有帮到我们什么。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，通过把应用到"trunk" Stream上的所有操作都应用到"branch" Stream上，可以"flatten" Metastream。Flatmap并不是用来"fix" Metastream的，因为Metastream也不是一个Bug，这只是一些用来处理FRP中的异步响应(Asynchronous response)的工具。
+Response的Metastream看起来会让人困惑，并且看起来也没有帮到我们什么。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，通过把应用到"trunk" Stream上的所有操作都应用到"branch" Stream上，可以"flatten" Metastream。Flatmap并不是用来"fix" Metastream的，因为Metastream也不是一个Bug，这只是一些用来处理RP中的异步响应(Asynchronous response)的工具。
 
 ```javascript
 var responseStream = requestStream
@@ -335,7 +335,7 @@ refreshClickStream.subscribe(function() {
 });
 ```
 
-不，别那么快，朋友。这样不好，我们现在有 **两个** Subscriber会影响到推荐的DOM元素(另外一个是`responseStream.subscribe()`)，而且这样完全不符合[Separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)。还记得FRP的咒语么？
+不，别那么快，朋友。这样不好，我们现在有 **两个** Subscriber会影响到推荐的DOM元素(另外一个是`responseStream.subscribe()`)，而且这样完全不符合[Separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)。还记得RP的咒语么？
 
 &nbsp;
 &nbsp;
@@ -547,18 +547,18 @@ suggestion1Stream.subscribe(function(suggestion) {
 
 **你可以查看这个最终效果 http://jsfiddle.net/staltz/8jFJH/48/**
 
-这段代码虽然短小，但实现了不少功能：它适当的使用Separation of concerns实现了对Multiple events的管理，甚至缓存了响应。函数式的风格让代码看起来更加Declarative而非Imperative：我们并非给出一组指令去执行，而是通过定义Stream之间的关系 **定义这是什么**。举个例子，我们使用FRP告诉计算机 _`suggestion1Stream` **是** 由 'close 1' Stream与最新响应中的一个用户合并(combine)而来，在程序刚运行或者刷新时则是`null`_。
+这段代码虽然短小，但实现了不少功能：它适当的使用Separation of concerns实现了对Multiple events的管理，甚至缓存了响应。函数式的风格让代码看起来更加Declarative而非Imperative：我们并非给出一组指令去执行，而是通过定义Stream之间的关系 **定义这是什么**。举个例子，我们使用RP告诉计算机 _`suggestion1Stream` **是** 由 'close 1' Stream与最新响应中的一个用户合并(combine)而来，在程序刚运行或者刷新时则是`null`_。
 
-留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在FRP中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的Stream函数，甚至更多类似的函数去控制一个事件驱动(Event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
+留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在RP中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的Stream函数，甚至更多类似的函数去控制一个事件驱动(Event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
 
 ## 下一步
 
-如果你觉得Rx*会成为你首选的FRP库，花点时间去熟悉这个[函数列表](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md)，包括了如何转换(transform)、合并(combine)、以及创建Observable。如果你想通过图表去理解这些函数，看一下这份[RxJava's very useful documentation with marble diagrams](https://github.com/Netflix/RxJava/wiki/Creating-Observables)。无论什么时候你遇到问题，画一下这些图，思考一下，看一下这一大串函数，然后继续思考。以我个人经验，这样效果很明显。
+如果你觉得Rx*会成为你首选的RP库，花点时间去熟悉这个[函数列表](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md)，包括了如何转换(transform)、合并(combine)、以及创建Observable。如果你想通过图表去理解这些函数，看一下这份[RxJava's very useful documentation with marble diagrams](https://github.com/Netflix/RxJava/wiki/Creating-Observables)。无论什么时候你遇到问题，画一下这些图，思考一下，看一下这一大串函数，然后继续思考。以我个人经验，这样效果很明显。
 
 一旦你开始使用Rx*去编程，很有必要去理解[Cold vs Hot Observables](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md#cold-vs-hot-observables)中的概念。如果忽略了这些，你一不小心就会被它坑了。我提醒过你了。通过学习真正的函数式编程(Funational programming)去提升自己的技能，并熟悉那些会影响到Rx*的问题，比如副作用(Side effect)。
 
-但是FRP不仅仅有Rx*。还有相对容易理解的[Bacon.js](http://baconjs.github.io/)，它没有Rx*那些怪癖。[Elm Language](http://elm-lang.org/)则以它自己的方式支持FRP：它是一门会编译成Javascript + HTML + CSS的FRP **语言**，并有一个[Time travelling debugger](http://debug.elm-lang.org/)。非常NB。
+但是RP不仅仅有Rx*。还有相对容易理解的[Bacon.js](http://baconjs.github.io/)，它没有Rx*那些怪癖。[Elm Language](http://elm-lang.org/)则以它自己的方式支持RP：它是一门会编译成Javascript + HTML + CSS的RP **语言**，并有一个[Time travelling debugger](http://debug.elm-lang.org/)。非常NB。
 
-FRP在需要处理大量事件的Frontend和Apps中非常有用。但它不仅仅能用在客户端，在Backend或者与Database交互时也非常有用。事实上，[RxJava是实现Netflix's API服务器端并发的一个重要组件](http://techblog.netflix.com/2013/02/rxjava-netflix-api.html)。FRP并不是一个只能在某种应用或者语言中使用的Framework。它本质上是一个在开发任何Event-driven软件中都能使用的编程范式(Paradigm)。
+RP在需要处理大量事件的Frontend和Apps中非常有用。但它不仅仅能用在客户端，在Backend或者与Database交互时也非常有用。事实上，[RxJava是实现Netflix's API服务器端并发的一个重要组件](http://techblog.netflix.com/2013/02/rxjava-netflix-api.html)。RP并不是一个只能在某种应用或者语言中使用的Framework。它本质上是一个在开发任何Event-driven软件中都能使用的编程范式(Paradigm)。
 
 如果这份教程能帮到你，[请与更多人分享](https://twitter.com/intent/tweet?original_referer=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754%2F&amp;text=The%20introduction%20to%20Reactive%20Programming%20you%27ve%20been%20missing&amp;tw_p=tweetbutton&amp;url=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754&amp;via=andrestaltz)。
