@@ -175,7 +175,7 @@ Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.f
 
 这样非常不错，并展现了Observables至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下Rx Observables能胜任些什么。
 
-现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在RP内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样子做。
+现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在Rx内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样子做。
 
 你现在需要知道的一个基本的函数是[`map(f)`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemapselector-thisarg)，它分别把`f()`应用到Stream A中的每一个Value，并把返回的Value放进Stream B里。如果我们也对Request Stream与Response Stream进行同样的处理，我们可以把Request URL映射(map)为Response Promise(而Promise可以转为Streams)。
 
