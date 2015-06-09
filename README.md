@@ -10,7 +10,7 @@
 
 > 作者在回复中提了一下FRP与RP是不同的，同时建议把这份教程中的FRP都替换为RP，所以译文就把FRP都替换为RP了。
 
-很明显你是有兴趣学习这种被称作RP(Reactive Programming)的新技术才来看这篇文章的。
+很明显你有兴趣学习这种被称作RP(Reactive Programming)的新技术，特别是它对应的实现如：Rx、Bacon.js、RAC等。
 
 学习RP是很困难的一个过程，特别是在缺乏优秀资料的前提下。刚开始学习时，我试过去找一些教程，并找到了为数不多的实用教程，但是它们都流于表面，从没有围绕RP构建起一个完整的知识体系。库的文档往往也无法帮助你去了解它的函数。不信的话可以看一下这个：
 
@@ -112,7 +112,7 @@ RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑
 
 ## Request与Response
 
-**在RP中你该怎么处理这个问题呢？** 好吧，首先，(几乎)_所有的东西都可以转为一个Stream_。这就是RP的咒语。让我们先从最简单的特性开始："在启动时，从API加载3个帐号的数据"。这并没有什么特别，就只是简单的(1)发出一个请求，(2)收到一个响应，(3)渲染这个响应。所以，让我们继续，并用Stream代表我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
+**在Rx中你该怎么处理这个问题呢？** 好吧，首先，(几乎)_所有的东西都可以转为一个Stream_。这就是Rx的咒语。让我们先从最简单的特性开始："在启动时，从API加载3个帐号的数据"。这并没有什么特别，就只是简单的(1)发出一个请求，(2)收到一个响应，(3)渲染这个响应。所以，让我们继续，并用Stream代表我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
 
 在启动的时候，我们只需要发出一个请求，所以如果我们把它转为一个Data stream的话，那就是一个只有一个Value的Stream。稍后，我们知道将会有多个请求发生，但现在，就只有一个请求。
 
@@ -127,7 +127,7 @@ a是一个String 'https://api.github.com/users'
 在RX*中，创建只有一个Value的Stream是非常简单的。官方把一个Stream称作Observable，因为它可以被观察(can be observed => observable)，但是我发现那是个很傻逼的名子，所以我把它叫做_Stream_。
 
 ```javascript
-var requestStream = Rx.Observable.returnValue('https://api.github.com/users');
+var requestStream = Rx.Observable.just('https://api.github.com/users');
 ```
 
 但是现在，那只是一个包含了String的Stream，并没有什么特别，所以我们需要以某种方式使Value被emit。就是通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个Stream。
@@ -141,7 +141,7 @@ requestStream.subscribe(function(requestUrl) {
 }
 ```
 
-留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。但先等等，RP可以用来处理 **异步** Data stream。那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
+留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。但先等等，Rx可以用来处理 **异步** Data stream。那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
 
 ```javascript
 requestStream.subscribe(function(requestUrl) {
@@ -171,9 +171,9 @@ requestStream.subscribe(function(requestUrl) {
 
 Yes.
 
-Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.fromPromise(promise)`轻易的把一个Promise转为Observable，所以我们就这样子做吧。唯一的不同就是Observable并不遵循[Promises/A+](http://promises-aplus.github.io/promises-spec/)，但概念上没有冲突。Promise就是只有一个Value的Observable。RP Stream比Promise更进一步的是允许返回多个Value。
+Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.fromPromise(promise)`轻易的把一个Promise转为Observable，所以我们就这样子做吧。唯一的不同就是Observable并不遵循[Promises/A+](http://promises-aplus.github.io/promises-spec/)，但概念上没有冲突。Promise就是只有一个Value的Observable。Rx Stream比Promise更进一步的是允许返回多个Value。
 
-这样非常不错，并展现了RP至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下RP能胜任些什么。
+这样非常不错，并展现了Observables至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下Rx Observables能胜任些什么。
 
 现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在RP内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样子做。
 
@@ -190,7 +190,7 @@ var responseMetastream = requestStream
 
 ![Response metastream](http://i.imgur.com/HHnmlac.png)
 
-Response的Metastream看起来会让人困惑，并且看起来也没有帮到我们什么。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，通过把应用到"trunk" Stream上的所有操作都应用到"branch" Stream上，可以"flatten" Metastream。Flatmap并不是用来"fix" Metastream的，因为Metastream也不是一个Bug，这只是一些用来处理RP中的异步响应(Asynchronous response)的工具。
+Response的Metastream看起来会让人困惑，并且看起来也没有帮到我们什么。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，通过把应用到"trunk" Stream上的所有操作都应用到"branch" Stream上，可以"flatten" Metastream。Flatmap并不是用来"fix" Metastream的，因为Metastream也不是一个Bug，这只是一些用来处理Rx中的异步响应(Asynchronous response)的工具。
 
 ```javascript
 var responseStream = requestStream
@@ -221,7 +221,7 @@ responseStream.subscribe(function(response) {
 把目前为止所有的代码放到一起就是这样：
 
 ```javascript
-var requestStream = Rx.Observable.returnValue('https://api.github.com/users');
+var requestStream = Rx.Observable.just('https://api.github.com/users');
 
 var responseStream = requestStream
   .flatMap(function(requestUrl) {
@@ -265,7 +265,7 @@ var requestOnRefreshStream = refreshClickStream
     return 'https://api.github.com/users?since=' + randomOffset;
   });
 
-var startupRequestStream = Rx.Observable.returnValue('https://api.github.com/users');
+var startupRequestStream = Rx.Observable.just('https://api.github.com/users');
 ```
 
 但我们怎样才能把这两个"合成(merge)"一个呢？好吧，有[`merge()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemergemaxconcurrent--other)函数。这就是它做的事的图解：
@@ -286,7 +286,7 @@ var requestOnRefreshStream = refreshClickStream
     return 'https://api.github.com/users?since=' + randomOffset;
   });
 
-var startupRequestStream = Rx.Observable.returnValue('https://api.github.com/users');
+var startupRequestStream = Rx.Observable.just('https://api.github.com/users');
 
 var requestStream = Rx.Observable.merge(
   requestOnRefreshStream, startupRequestStream
@@ -301,7 +301,7 @@ var requestStream = refreshClickStream
     var randomOffset = Math.floor(Math.random()*500);
     return 'https://api.github.com/users?since=' + randomOffset;
   })
-  .merge(Rx.Observable.returnValue('https://api.github.com/users'));
+  .merge(Rx.Observable.just('https://api.github.com/users'));
 ```
 
 甚至可以更短，更具有可读性：
@@ -549,9 +549,9 @@ suggestion1Stream.subscribe(function(suggestion) {
 
 **你可以查看这个最终效果 http://jsfiddle.net/staltz/8jFJH/48/**
 
-这段代码虽然短小，但实现了不少功能：它适当的使用Separation of concerns实现了对Multiple events的管理，甚至缓存了响应。函数式的风格让代码看起来更加Declarative而非Imperative：我们并非给出一组指令去执行，而是通过定义Stream之间的关系 **定义这是什么**。举个例子，我们使用RP告诉计算机 _`suggestion1Stream` **是** 由 'close 1' Stream与最新响应中的一个用户合并(combine)而来，在程序刚运行或者刷新时则是`null`_。
+这段代码虽然短小，但实现了不少功能：它适当的使用Separation of concerns实现了对Multiple events的管理，甚至缓存了响应。函数式的风格让代码看起来更加Declarative而非Imperative：我们并非给出一组指令去执行，而是通过定义Stream之间的关系 **定义这是什么**。举个例子，我们使用Rx告诉计算机 _`suggestion1Stream` **是** 由 'close 1' Stream与最新响应中的一个用户合并(combine)而来，在程序刚运行或者刷新时则是`null`_。
 
-留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在RP中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的Stream函数，甚至更多类似的函数去控制一个事件驱动(Event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
+留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在Rx中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的Stream函数，甚至更多类似的函数去控制一个事件驱动(Event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
 
 ## 下一步
 
@@ -559,8 +559,8 @@ suggestion1Stream.subscribe(function(suggestion) {
 
 一旦你开始使用Rx*去编程，很有必要去理解[Cold vs Hot Observables](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md#cold-vs-hot-observables)中的概念。如果忽略了这些，你一不小心就会被它坑了。我提醒过你了。通过学习真正的函数式编程(Funational programming)去提升自己的技能，并熟悉那些会影响到Rx*的问题，比如副作用(Side effect)。
 
-但是RP不仅仅有Rx*。还有相对容易理解的[Bacon.js](http://baconjs.github.io/)，它没有Rx*那些怪癖。[Elm Language](http://elm-lang.org/)则以它自己的方式支持RP：它是一门会编译成Javascript + HTML + CSS的RP **语言**，并有一个[Time travelling debugger](http://debug.elm-lang.org/)。非常NB。
+但是RP不仅仅有Rx*。还有相对容易理解的[Bacon.js](http://baconjs.github.io/)，它没有Rx*那些怪癖。[Elm Language](http://elm-lang.org/)则以它自己的方式支持RP：它是一门会编译成Javascript + HTML + CSS的FRP **语言**，并有一个[Time travelling debugger](http://debug.elm-lang.org/)。非常NB。
 
-RP在需要处理大量事件的Frontend和Apps中非常有用。但它不仅仅能用在客户端，在Backend或者与Database交互时也非常有用。事实上，[RxJava是实现Netflix's API服务器端并发的一个重要组件](http://techblog.netflix.com/2013/02/rxjava-netflix-api.html)。RP并不是一个只能在某种应用或者语言中使用的Framework。它本质上是一个在开发任何Event-driven软件中都能使用的编程范式(Paradigm)。
+Rx在需要处理大量事件的Frontend和Apps中非常有用。但它不仅仅能用在客户端，在Backend或者与Database交互时也非常有用。事实上，[RxJava是实现Netflix's API服务器端并发的一个重要组件](http://techblog.netflix.com/2013/02/rxjava-netflix-api.html)。Rx并不是一个只能在某种应用或者语言中使用的Framework。它本质上是一个在开发任何Event-driven软件中都能使用的编程范式(Paradigm)。
 
 如果这份教程能帮到你，[请与更多人分享](https://twitter.com/intent/tweet?original_referer=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754%2F&amp;text=The%20introduction%20to%20Reactive%20Programming%20you%27ve%20been%20missing&amp;tw_p=tweetbutton&amp;url=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754&amp;via=andrestaltz)。
