@@ -75,7 +75,7 @@ counterStream: ---1----2--3----4------5-->
 
 ![Multiple clicks stream](http://i.imgur.com/HMGWNO5.png)
 
-灰色的方框是用来转换Stream的函数。首先，我们把连续250ms内的Click都放进一个列表(原文："First we accumulate clicks in lists, whenever 250 milliseconds of "event silence" has happened." 实在不知道怎么翻译，就按自己的理解写了一下) -- 简单来说就是`buffer(stream.throttle(250ms))`做的事，不要在意这些细节，我们只是展示一下RP而已。结果是一个列表的Stream，然后我们使用`map()`把每个列表映射为一个整数，即它的长度。最终，我们使用`filter(x >= 2)`把整数`1`给过滤掉。就这样，3个操作就生成了我们想要的Stream。然后我们就可以订阅(监听)这个Stream，并以我们所希望的方式作出反应。
+灰色的方框是用来转换Stream的函数。首先，我们把时间间隔大于250ms的Click都放进一个列表(原文："First we accumulate clicks in lists, whenever 250 milliseconds of "event silence" has happened." ) -- 简单来说就是`buffer(stream.throttle(250ms))`做的事，不要在意这些细节，我们只是展示一下RP而已。结果是一个列表的Stream，然后我们使用`map()`把每个列表映射为一个整数，即它的长度。最终，我们使用`filter(x >= 2)`把整数`1`给过滤掉。就这样，3个操作就生成了我们想要的Stream。然后我们就可以订阅(监听)这个Stream，并以我们所希望的方式作出反应。
 
 我希望你能感受到这个示例的优美之处。这个示例只是冰山一角：你可以把同样的操作应用到不同种类的Stream上，例如，一个API响应的Stream；另一方面，还有很多其它可用的函数。
 
