@@ -145,7 +145,7 @@ requestStream.subscribe(function(requestUrl) {
 }
 ```
 
-留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。但先等等，Rx可以用来处理 **异步** Data stream。那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
+留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。是等一等，Rx可以用来处理 **异步** Data stream，那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
 
 ```javascript
 requestStream.subscribe(function(requestUrl) {
