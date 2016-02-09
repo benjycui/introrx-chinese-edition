@@ -194,7 +194,7 @@ var responseMetastream = requestStream
 
 ![Response metastream](http://i.imgur.com/HHnmlac.png)
 
-Response的Metastream看起来会让人困惑，并且看起来也没有帮到我们什么。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，通过把应用到"trunk" Stream上的所有操作都应用到"branch" Stream上，可以"flatten" Metastream。Flatmap并不是用来"fix" Metastream的，因为Metastream也不是一个Bug，这只是一些用来处理Rx中的异步响应(Asynchronous response)的工具。
+Response的Metastream看起来会让人困惑，看起来也没有什么帮助。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，通过把应用到"trunk" Stream上的所有操作都应用到"branch" Stream上，可以"flatten" Metastream。Flatmap并不是用来"fix" Metastream的，因为Metastream也不是一个Bug，这只是一些用来处理Rx中的异步响应(Asynchronous response)的工具。
 
 ```javascript
 var responseStream = requestStream
