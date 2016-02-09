@@ -241,7 +241,9 @@ responseStream.subscribe(function(response) {
 
 我之前并没有提到返回的JSON是一个有着100个用户数据的列表。因为这个API只允许我们设置偏移量(Offset)，而无法设置返回的用户数，所以我们现在是只用了3个用户的数据而浪费了另外97个的数据。这个问题暂时可以忽略，稍后我们会学习怎么缓存这些数据。
 
-每点击一次Refresh按钮，Request stream就会emit一个新的URL，同时也会返回一个新的Response。我们需要两样东西：一个是Refresh按钮上Click events组成的Stream(咒语：一切皆Stream)，而Request stream将改为随Refresh click stream作出反应。幸运的是，RxJS提供了从Event listener生成Observable的函数。
+每点击一次Refresh按钮，Request stream便应emit一个新的URL，这样我们就能得到一个新的Response。我们需要两样东西来达成这点要求：    
+1. 由Refresh按钮上Click events组成的Stream(咒语：一切皆Stream)；    
+2. Request stream也应该改为由Refresh click stream所生成的stream。幸运的是，RxJS提供了从Event listener生成Observable的函数。
 
 ```javascript
 var refreshButton = document.querySelector('.refresh');
