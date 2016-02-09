@@ -260,7 +260,7 @@ var requestStream = refreshClickStream
   });
 ```
 
-因为我比较笨并且也没有使用自动化测试，所以我刚把之前做好的一个特性搞烂了。现在在启动时不会再发出任何的Request，而只有在点击Refresh按钮时才会。额...这两个行为我都需要：无论是点击Refresh按钮时还是刚打开页面时都该发出一个Request。
+因为我比较笨并且也没有使用自动化测试，所以我刚把之前做好的一个特性搞烂了。现在在启动时不会再发出任何的Request，而只有在点击Refresh按钮时才会。额...但是这两个行为我都需要：无论是点击Refresh按钮时还是刚打开页面时都该发出一个Request。
 
 我们知道怎么分别为这两种情况生成Stream：
 
@@ -274,7 +274,7 @@ var requestOnRefreshStream = refreshClickStream
 var startupRequestStream = Rx.Observable.just('https://api.github.com/users');
 ```
 
-但我们怎样才能把这两个"合成(merge)"一个呢？好吧，有[`merge()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemergemaxconcurrent--other)函数。这就是它做的事的图解：
+但怎样才能把这两个"合成(merge)"一个呢？好吧，我们有[`merge()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemergemaxconcurrent--other)这个函数，参考下面这个图解：
 
 ```
 stream A: ---a--------e-----o----->
