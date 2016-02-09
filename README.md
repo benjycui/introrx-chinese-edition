@@ -190,7 +190,7 @@ var responseMetastream = requestStream
   });
 ```
 
-然后，我们将会创造一个叫做"_Metastream_"的怪物：包含Stream的Stream。暂时不需要害怕。Metastream就是emit的每个Value都是Stream的Stream。你可以把它想像为[指针(Pointer)](https://en.wikipedia.org/wiki/Pointer_(computer_programming))：每个Value都是一个指向其它Stream的指针。在我们的例子里，每个Request URL都会被映射(map)为一个指向包含响应Promise stream的指针。
+然后，我们将会创造一个叫做"_Metastream_"的怪物：包含Stream的Stream。暂时不需要害怕。Metastream就是emit的每个Value都是Stream的Stream。你可以把它想像为[指针(Pointer)](https://en.wikipedia.org/wiki/Pointer_(computer_programming))：每个Value都是一个指向其它Stream的指针。在我们的例子里，每个Request URL都会被映射为一个指向包含响应Promise stream的指针。
 
 ![Response metastream](http://i.imgur.com/HHnmlac.png)
 
