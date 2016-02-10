@@ -26,7 +26,7 @@
 
 ## 什么是RP?
 
-在互联网上有着一大堆糟糕的解释与定义。[维基百科](https://en.wikipedia.org/wiki/Functional_reactive_programming)一如既往的空泛与理论化。[Stackoverflow](http://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming)的权威答案明显不适合初学者。[Reactive Manifesto](http://www.reactivemanifesto.org/)看起来是你展示给你公司的项目经理或者老板们看的东西。微软的[Rx terminology](https://rx.codeplex.com/) "Rx = Observables + LINQ + Schedulers" 过于重量级且微软味十足，只会让大部分人困惑。相对于你所使用的MV*框架以及钟爱的编程语言，"Reactive"和"Propagation of change"这些术语并没有传达任何有意义的概念。框架的Views层当然要对Models层作出反应，改变当然会传播(分别对应上文的"Reactive"与"Propagation of change"，意思是这一大堆术语和废话差不多，翻译不好，只能靠备注了)。如果没有这些，就没有东西会被渲染了。
+在互联网上有着一大堆糟糕的解释与定义。[维基百科](https://en.wikipedia.org/wiki/Functional_reactive_programming)一如既往的空泛与理论化。[Stackoverflow](http://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming)的权威答案明显不适合初学者。[Reactive Manifesto](http://www.reactivemanifesto.org/)看起来是你展示给你公司的项目经理或者老板们看的东西。微软的[Rx terminology](https://rx.codeplex.com/) "Rx = Observables + LINQ + Schedulers" 过于重量级且微软味十足，只会让大部分人困惑。相对于你所使用的MV*框架以及钟爱的编程语言，"Reactive"和"propagation of change"这些术语并没有传达任何有意义的概念。框架的Views层当然要对Models层作出反应，数据的改变当然会传播开来(propagate)。如果没有这些，就没有东西会被渲染了。
 
 所以不要再扯这些废话了。
 
@@ -40,9 +40,9 @@
 
 ![Click event stream](http://i.imgur.com/cL4MOsS.png)
 
-Stream就是一个 **按时间排序的Events序列** ，它可以emit三种不同的Events：(某种类型的)Value、Error或者一个"Completed" 的信号。举一个"Completed"的例子，当包含这个按钮(指上面点击一个按钮例子中的按钮)的Window或者View被关闭时，"Completed"便会发生。
+Stream就是一个 **按时间排序的Events序列** ，它可以emit三种不同的events：(某种类型的)value、error或者一个"completed" 的信号。举一个"completed"的例子，当包含这个按钮(指上面点击一个按钮例子中的按钮)的window或者view被关闭时，"completed"便会发生。
 
-通过分别为Value、Error、"Completed"定义事件处理函数，我们将会异步地捕获这些events。有时可以忽略Error与"Completed"，你只需要定义Value的事件处理函数就行。监听一个stream也被称作是 **订阅(Subscribing)**，而我们所定义的函数就是观察者(Observer)，stream则是被观察者(Observable)，其实就是[观察者模式(Observer Design Pattern)](https://en.wikipedia.org/wiki/Observer_pattern)。
+通过分别为value、error、"completed"定义事件处理函数，我们将会异步地捕获这些events。有时可以忽略error与"completed"，你只需要定义value的事件处理函数就行。监听一个stream也被称作是 **订阅(Subscribing)**，而我们所定义的函数就是观察者(Observer)，stream则是被观察者(Observable)，其实就是[观察者模式(Observer Design Pattern)](https://en.wikipedia.org/wiki/Observer_pattern)。
 
 上面的示意图也可以使用ASCII重画为下图，在下面的部分教程中我们会使用这幅图：
 
@@ -116,9 +116,9 @@ RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑
 1. 发出一个请求，    
 2. 收到一个响应，    
 3. 渲染这个响应。  
-让我们继续，用Stream模型作为我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
+让我们继续，用stream模型作为我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
 
-在启动的时候，我们只需要发出一个请求，所以如果我们把它转为一个Data stream的话，那就是一个只有一个Value的Stream。稍后，我们知道将会有多个请求发生，但现在，就只有一个请求。
+在启动的时候，我们只需要发出一个请求，所以如果我们把它转为一个data stream的话，那就是一个只有一个值的stream。稍后，我们知道将会有多个请求发生，但现在，就只有一个请求。
 
 ```
 --a------|->
@@ -126,15 +126,15 @@ RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑
 a是一个String 'https://api.github.com/users'
 ```
 
-这是一个包含了我们想向其发出请求的URL的Stream。每当一个请求事件发生时，它会告诉我们两件事："什么时候"与"什么东西"。"什么时候"这个请求会被执行，就是什么时候这个Event会被emit。"什么东西"会被请求，就是这个emit出来的Value：一个包含URL的String。
+这是一个包含了我们想向其发出请求的URL的stream。每当一个请求事件发生时，它会告诉我们两件事："什么时候"与"什么东西"。"什么时候"这个请求会被执行，就是什么时候这个event会被emit。"什么东西"会被请求，就是这个emit出来的值：一个包含URL的字符串。
 
-在RX*中，创建只有一个Value的Stream是非常简单的。官方把一个Stream称作Observable，因为它可以被观察(can be observed => observable)，但是我发现那是个很傻逼的名子，所以我把它叫做_Stream_。
+在RX*中，创建只有一个值的stream是非常简单的。官方把一个stream称作Observable，因为它可以被观察(can be observed => observable)，但是我发现那是个很傻逼的名子，所以我把它叫做_Stream_。
 
 ```javascript
 var requestStream = Rx.Observable.just('https://api.github.com/users');
 ```
 
-但是现在，那只是一个包含了String的Stream，并没有什么特别，所以我们需要以某种方式使Value被emit。就是通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个Stream。
+但是现在，那只是一个由字符串组成的stream，并不会引起其他的操作。当这个值被emit的时候，我们需要以某种方式引起相关的操作。通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个Stream，便可以完成这个目的。
 
 ```javascript
 requestStream.subscribe(function(requestUrl) {
@@ -145,7 +145,7 @@ requestStream.subscribe(function(requestUrl) {
 }
 ```
 
-留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。是等一等，Rx可以用来处理 **异步** Data stream，那这个请求的响应就不能当作一个包含了将会到达的数据的Stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
+留意一下我们使用了jQuery的Ajax函数(我们假设你已经知道[它的用途](http://devdocs.io/jquery/jquery.getjson))去发出异步请求。但是等一等，Rx可以用来处理 **异步** data stream，那这个请求的响应就不能当作一个包含了将会到达的数据的stream么？当然，从理论上来讲，应该是可以的，所以我们尝试一下。
 
 ```javascript
 requestStream.subscribe(function(requestUrl) {
@@ -163,7 +163,7 @@ requestStream.subscribe(function(requestUrl) {
 }
 ```
 
-[`Rx.Observable.create()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablecreatesubscribe)所做的事就是通过显式的通知每一个Observer(或者说是Subscriber) Data events(`onNext()`)或者Errors (`onError()`)来创建你自己的Stream。而我们所做的就只是把jQuery Ajax Promise包装起来而已。**打扰一下，这意味者Promise本质上就是一个Observable？**
+[`Rx.Observable.create()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservablecreatesubscribe)所做的事就是通过显式的通知每一个Observer(或者说是Subscriber) data events(`onNext()`)或者errors (`onError()`)来创建你自己的stream。而我们所做的就只是把jQuery Ajax Promise包装起来而已。**打扰一下，这意味者Promise本质上就是一个Observable？**
 
 &nbsp;
 &nbsp;
@@ -175,13 +175,13 @@ requestStream.subscribe(function(requestUrl) {
 
 Yes.
 
-Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.fromPromise(promise)`轻易的把一个Promise转为Observable，所以我们就这样做吧。唯一的不同就是Observable并不遵循[Promises/A+](http://promises-aplus.github.io/promises-spec/)，但概念上没有冲突。Promise就是只有一个Value的Observable。Rx Stream比Promise更进一步的是允许返回多个Value。
+Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.fromPromise(promise)`轻易的把一个Promise转为Observable，所以我们就这样做吧。唯一的不同就是Observable并不遵循[Promises/A+](http://promises-aplus.github.io/promises-spec/)，但概念上没有冲突。Promise就是只有一个Value的Observable。Rx Stream比Promise更进一步的是允许返回多个value。
 
 这样非常不错，并展现了Observables至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下Rx Observables能胜任些什么。
 
 现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在Rx内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样做。
 
-你现在需要知道的一个基本的函数是[`map(f)`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemapselector-thisarg)，它分别把`f()`应用到Stream A中的每一个Value，并把返回的Value放进Stream B里。如果我们也对Request Stream与Response Stream进行同样的处理，我们可以把Request URL映射为Response Promise(而Promise可以转为Streams)。
+你现在需要知道的一个基本的函数是[`map(f)`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemapselector-thisarg)，它分别把`f()`应用到stream A中的每一个value，并把返回的value放进stream B里。如果我们也对request stream与response stream进行同样的处理，我们可以把request URL映射为response Promise(而Promise可以转为Streams)。
 
 ```javascript
 var responseMetastream = requestStream
@@ -190,7 +190,7 @@ var responseMetastream = requestStream
   });
 ```
 
-然后，我们将会创造一个叫做"_Metastream_"的怪物：包含Stream的Stream。暂时不需要害怕。Metastream就是emit的每个Value都是Stream的Stream。你可以把它想像为[指针(Pointer)](https://en.wikipedia.org/wiki/Pointer_(computer_programming))：每个Value都是一个指向其它Stream的指针。在我们的例子里，每个Request URL都会被映射为一个指向包含响应Promise stream的指针。
+然后，我们将会创造一个叫做"_Metastream_"的怪物：包含stream的stream。暂时不需要害怕。Metastream就是emit的每个value都是stream的stream。你可以把它想像为[指针(Pointer)](https://en.wikipedia.org/wiki/Pointer_(computer_programming))：每个value都是一个指向其它stream的指针。在我们的例子里，每个request URL都会被映射为一个指向包含响应Promise stream的指针。
 
 ![Response metastream](http://i.imgur.com/HHnmlac.png)
 
