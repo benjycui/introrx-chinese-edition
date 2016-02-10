@@ -34,7 +34,7 @@
 
 一方面，这并不是什么新东西。Event buses或者click events本质上就是异步事件流(asynchronous event stream)，你可以监听并处理这些事件。RP的思路大概如下：你使用任何东西创建data stream，而不仅仅是click或hover事件(原文："FRP is that idea on steroids. You are able to create data streams of anything, not just from click and hover events.")。Stream廉价且常见，任何东西都可以是一个stream：变量、用户输入、属性、Cache、数据结构等等。举个例子，想像一下你的Twitter feed就像是click events那样的data stream，你可以监听它并相应的作出响应。
 
-**在这个基础上，你还有令人惊艳的函数去combine、create、filter这些Stream。**这就是函数式(Functional)魔法的用武之地。Stream能接受一个，甚至多个stream为输入。你可以_merge_两个stream，也可以从一个stream中_filter_出你感兴趣的events以生成一个新的stream，还可以把一个stream中的值_map_到一个新的stream中。
+**在这个基础上，你还有令人惊艳的函数去combine、create、filter这些Stream。**这就是函数式(Functional)魔法的用武之地。Stream能接受一个，甚至多个stream为输入。你可以_merge_两个stream，也可以从一个stream中_filter_出你感兴趣的events以生成一个新的stream，还可以把一个stream中的value_map_到一个新的stream中。
 
 既然stream在RP中如此重要，那么我们就应该好好的了解它们，就从我们熟悉的"点击一个按钮"这个event stream开始。
 
@@ -67,7 +67,7 @@ X is an error
 counterStream: ---1----2--3----4------5-->
 ```
 
-`map(f)`会根据你提供的`f`函数把原stream中的值分别映射到新的stream中。在我们的例子中，我们把每一次点击都映射为数字1。`scan(g)`会根据你提供的`g`函数把stream中的所有值聚合成一新的个值 -- `x = g(accumulated, current)`，这个示例中`g`只是一个简单的add函数。然后，每点击一次，`counterStream`就会把点击的总次数发给它的观察者。
+`map(f)`会根据你提供的`f`函数把原stream中的value分别映射到新的stream中。在我们的例子中，我们把每一次点击都映射为数字1。`scan(g)`会根据你提供的`g`函数把stream中的所有value聚合成一个新的value -- `x = g(accumulated, current)`，这个示例中`g`只是一个简单的add函数。然后，每点击一次，`counterStream`就会把点击的总次数发给它的观察者。
 
 为了展示RP真正的实力，让我们假设你想得到一个包含双击事件的stream。为了让它更加有趣，假设我们想要的这个stream要同时考虑三击(triple clicks)，或者更加宽泛，连击(multiple clicks)。深呼吸一下，然后想像一下在传统的命令式且带状态的方式中你会怎么实现。我敢打赌代码会像一堆乱麻，并且会使用一些的变量保存状态，同时也有一些计算时间间隔的代码。
 
@@ -118,7 +118,7 @@ RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑
 3. 渲染这个响应。  
 让我们继续，用stream模型作为我们的请求。一开始可能会觉得杀鸡用牛刀，但我们应当从最基本的开始，是吧？
 
-在启动的时候，我们只需要发出一个请求，所以如果我们把它转为一个data stream的话，那就是一个只有一个值的stream。稍后，我们知道将会有多个请求发生，但现在，就只有一个请求。
+在启动的时候，我们只需要发出一个请求，所以如果我们把它转为一个data stream的话，那就是一个只有一个value的stream。稍后，我们知道将会有多个请求发生，但现在，就只有一个请求。
 
 ```
 --a------|->
@@ -126,15 +126,15 @@ RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑
 a是一个String 'https://api.github.com/users'
 ```
 
-这是一个包含了我们想向其发出请求的URL的stream。每当一个请求事件发生时，它会告诉我们两件事："什么时候"与"什么东西"。"什么时候"这个请求会被执行，就是什么时候这个event会被emit。"什么东西"会被请求，就是这个emit出来的值：一个包含URL的字符串。
+这是一个包含了我们想向其发出请求的URL的stream。每当一个请求事件发生时，它会告诉我们两件事："什么时候"与"什么东西"。"什么时候"这个请求会被执行，就是什么时候这个event会被emit。"什么东西"会被请求，就是这个emit出来的value：一个包含URL的字符串。
 
-在RX*中，创建只有一个值的stream是非常简单的。官方把一个stream称作Observable，因为它可以被观察(can be observed => observable)，但是我发现那是个很傻逼的名子，所以我把它叫做_Stream_。
+在RX*中，创建只有一个value的stream是非常简单的。官方把一个stream称作Observable，因为它可以被观察(can be observed => observable)，但是我发现那是个很傻逼的名子，所以我把它叫做_Stream_。
 
 ```javascript
 var requestStream = Rx.Observable.just('https://api.github.com/users');
 ```
 
-但是现在，那只是一个由字符串组成的stream，并不会引起其他的操作。当这个值被emit的时候，我们需要以某种方式引起相关的操作。通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个Stream，便可以完成这个目的。
+但是现在，那只是一个由字符串组成的stream，并不会引起其他的操作。当这个value被emit的时候，我们需要以某种方式引起相关的操作。通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个Stream，便可以完成这个目的。
 
 ```javascript
 requestStream.subscribe(function(requestUrl) {
@@ -352,7 +352,7 @@ refreshClickStream.subscribe(function() {
 
 ![Mantra](http://i.imgur.com/AIimQ8C.jpg)
 
-所以让我们把一条推荐设计成emit的值为一条推荐内容的JSON对象的Stream。其余的两条推荐，我们也以同样的方法处理。第一条推荐现在看起来是这样的：
+所以让我们把一条推荐设计成emit的value为一条推荐内容的JSON对象的Stream。其余的两条推荐，我们也以同样的方法处理。第一条推荐现在看起来是这样的：
 
 ```javascript
 var suggestion1Stream = responseStream
@@ -464,7 +464,7 @@ close1ClickStream: ------------c----->
 suggestion1Stream: ------s-----s----->
 ```
 
-在Rx*中，[`combineLatest`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypecombinelatestargs-resultselector)似乎实现了我们想要的功能。它接受两个Stream作为输入（Stream A和Stream B），当其中一个Stream emit一个值时，`combineLatest`便把最近两个emit的值`a`和`b`从各自的Stream中取出并且返回一个`c = f(a,b)`，`f`为你定义的函数。用图来表示便更加清晰了：
+在Rx*中，[`combineLatest`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypecombinelatestargs-resultselector)似乎实现了我们想要的功能。它接受两个Stream作为输入（Stream A和Stream B），当其中一个Stream emit一个value时，`combineLatest`便把最近两个emit的value`a`和`b`从各自的Stream中取出并且返回一个`c = f(a,b)`，`f`为你定义的函数。用图来表示便更加清晰了：
 
 ```
 stream A: --a-----------e--------i-------->
@@ -472,10 +472,10 @@ stream B: -----b----c--------d-------q---->
           vvvvvvvv combineLatest(f) vvvvvvv
           ----AB---AC--EC---ED--ID--IQ---->
 
-f是把值转化成大写字母的函数
+f是把输入字符转化成大写字母的函数
 ```
 
-我们可以在`close1ClickStream`和`responseStream`上使用combineLatest()，所以无论什么时候当一个按钮被点击时，我们可以拿到Response最新emit的值，并且在`suggestion1Stream`上产生一个新的值。另一方面，combineLatest()是对称的，当一个新的Response 在`responseStream` emit时，它将会把最后的'close1'的点击事件一起合并来产生一个新的推荐。这是有趣的，因为它允许我们把之前的`suggestion1Stream`代码简化成下边这个样子：
+我们可以在`close1ClickStream`和`responseStream`上使用combineLatest()，所以无论什么时候当一个按钮被点击时，我们可以拿到Response最新emit的value，并且在`suggestion1Stream`上产生一个新的value。另一方面，combineLatest()是对称的，当一个新的Response 在`responseStream` emit时，它将会把最后的'close1'的点击事件一起合并来产生一个新的推荐。这是有趣的，因为它允许我们把之前的`suggestion1Stream`代码简化成下边这个样子：
 
 ```javascript
 var suggestion1Stream = close1ClickStream
