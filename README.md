@@ -321,7 +321,7 @@ var requestStream = refreshClickStream
   .startWith('https://api.github.com/users');
 ```
 
-[`startWith()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypestartwithscheduler-args)函数做的事和你预期的完全一样。无论你输入的Stream是怎样，`startWith(x)`输出的Stream一开始都是`x`。但是还不够[DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself)，我重复了API URL。一个改进的方法是移掉`refreshClickStream`最后的`startWith()`，并在一开始的时候"emulate"一次Click。
+[`startWith()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypestartwithscheduler-args)函数做的事和你预期的完全一样。无论你输入的Stream是怎样，`startWith(x)`输出的Stream一开始都是`x`。但是还不够[DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself)，我重复了API URL。一个改进的方法是移掉`refreshClickStream`最后的`startWith()`，并在一开始的时候"模拟"点击一次refresh按钮。
 
 ```javascript
 var requestStream = refreshClickStream.startWith('startup click')
