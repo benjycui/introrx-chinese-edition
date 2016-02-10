@@ -343,7 +343,7 @@ refreshClickStream.subscribe(function() {
 });
 ```
 
-不，别那么快，朋友。这样不好，我们现在有 **两个** subscriber会影响到推荐的DOM元素(另外一个是`responseStream.subscribe()`)，而且这样完全不符合[Separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)。还记得RP的咒语么？
+不，别那么快，朋友。这样不好，我们现在有 **两个** subscriber会影响到推荐的DOM元素(另外一个是`responseStream.subscribe()`)，而且这样完全不符合[separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)。还记得RP的咒语么？
 
 &nbsp;
 &nbsp;
