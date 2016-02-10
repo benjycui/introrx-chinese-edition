@@ -464,7 +464,7 @@ close1ClickStream: ------------c----->
 suggestion1Stream: ------s-----s----->
 ```
 
-在Rx*中，[`combineLatest`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypecombinelatestargs-resultselector)似乎实现了我们想要的功能。它接受两个Stream，A和B作为输入，当其中一个Stream emit一个值时，`combineLatest`把最近两个emit的值`a`和`b`从各自的Stream中取出并且返回一个`c = f(x,y)`，`f`为你定义的函数。用图来表示更好：
+在Rx*中，[`combineLatest`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypecombinelatestargs-resultselector)似乎实现了我们想要的功能。它接受两个Stream作为输入（Stream A和Stream B），当其中一个Stream emit一个值时，`combineLatest`便把最近两个emit的值`a`和`b`从各自的Stream中取出并且返回一个`c = f(a,b)`，`f`为你定义的函数。用图来表示便更加清晰了：
 
 ```
 stream A: --a-----------e--------i-------->
