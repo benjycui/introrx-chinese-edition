@@ -22,7 +22,7 @@
 
 我看过两本书，一本只是讲述了一些概念，而另一本则纠结于如何使用RP库。我最终放弃了这种痛苦的学习方式，决定在开发中一边使用RP，一边理解它。在[Futurice](https://www.futurice.com)工作期间，我尝试在真实项目中使用RP，并且当我遇到困难时，得到了[同事们的帮助](http://blog.futurice.com/top-7-tips-for-rxjava-on-android)。
 
-在学习过程中最困难的一部分是 **以RP的方式思考**。这意味着要放弃命令式且带状态的(Imperative and stateful)编程习惯，并且要强迫你的大脑以一种不同的方式去工作。在互联网上我找不到任何关于这方面的教程，而我觉得这世界需要一份关于怎么以RP的方式思考的实用教程，这样你就有足够的资料去起步。库的文档无法为你的学习提供指引，而我希望这篇文章可以。
+在学习过程中最困难的一部分是 **以RP的方式思考**。这意味着要放弃命令式且带状态的(imperative and stateful)编程习惯，并且要强迫你的大脑以一种不同的方式去工作。在互联网上我找不到任何关于这方面的教程，而我觉得这世界需要一份关于怎么以RP的方式思考的实用教程，这样你就有足够的资料去起步。库的文档无法为你的学习提供指引，而我希望这篇文章可以。
 
 ## 什么是RP?
 
@@ -32,17 +32,17 @@
 
 ### RP是使用异步数据流进行编程
 
-一方面，这并不是什么新东西。Event buses或者Click events本质上就是异步事件流(Asynchronous event stream)，你可以监听并处理这些事件。RP的思路大概如下：你可以用包括Click和Hover事件在内的任何东西创建Data stream(原文："FRP is that idea on steroids. You are able to create data streams of anything, not just from click and hover events.")。Stream廉价且常见，任何东西都可以是一个Stream：变量、用户输入、属性、Cache、数据结构等等。举个例子，想像一下你的Twitter feed就像是Click events那样的Data stream，你可以监听它并相应的作出响应。
+一方面，这并不是什么新东西。Event buses或者click events本质上就是异步事件流(asynchronous event stream)，你可以监听并处理这些事件。RP的思路大概如下：你使用任何东西创建data stream，而不仅仅是click或hover事件(原文："FRP is that idea on steroids. You are able to create data streams of anything, not just from click and hover events.")。Stream廉价且常见，任何东西都可以是一个stream：变量、用户输入、属性、Cache、数据结构等等。举个例子，想像一下你的Twitter feed就像是click events那样的data stream，你可以监听它并相应的作出响应。
 
-**在这个基础上，你还有令人惊艳的函数去combine、create、filter这些Stream。**这就是函数式(Functional)魔法的用武之地。Stream能接受一个，甚至多个Stream为输入。你可以_merge_两个Stream，也可以从一个Stream中_filter_出你感兴趣的Events以生成一个新的Stream，还可以把一个Stream中的Data values _map_到一个新的Stream中。
+**在这个基础上，你还有令人惊艳的函数去combine、create、filter这些Stream。**这就是函数式(Functional)魔法的用武之地。Stream能接受一个，甚至多个stream为输入。你可以_merge_两个stream，也可以从一个stream中_filter_出你感兴趣的events以生成一个新的stream，还可以把一个stream中的值_map_到一个新的stream中。
 
-既然Stream在RP中如此重要，那么我们就应该好好的了解它们，就从我们熟悉的"Clicks on a button" Event stream开始。
+既然stream在RP中如此重要，那么我们就应该好好的了解它们，就从我们熟悉的"点击一个按钮"这个event stream开始。
 
 ![Click event stream](http://i.imgur.com/cL4MOsS.png)
 
-Stream就是一个 **按时间排序的Events(Ongoing events ordered in time)序列** ，它可以emit三种不同的Events：(某种类型的)Value、Error或者一个"Completed" 的信号。考虑一下"Completed"发生的时机，例如，当包含这个Button(指上面Clicks on a button"例子中的Button)的Window或者View被关闭时。
+Stream就是一个 **按时间排序的Events序列** ，它可以emit三种不同的Events：(某种类型的)Value、Error或者一个"Completed" 的信号。举一个"Completed"的例子，当包含这个按钮(指上面点击一个按钮例子中的按钮)的Window或者View被关闭时，"Completed"便会发生。
 
-通过分别为Value、Error、"Completed"定义事件处理函数，我们将会异步地捕获这些Events。有时可以忽略Error与"Completed"，你只需要定义Value的事件处理函数就行。监听一个Stream也被称作是 **订阅(Subscribing)**，而我们所定义的函数就是观察者(Observer)，Stream则是被观察者(Observable)，其实就是[观察者模式(Observer Design Pattern)](https://en.wikipedia.org/wiki/Observer_pattern)。
+通过分别为Value、Error、"Completed"定义事件处理函数，我们将会异步地捕获这些events。有时可以忽略Error与"Completed"，你只需要定义Value的事件处理函数就行。监听一个stream也被称作是 **订阅(Subscribing)**，而我们所定义的函数就是观察者(Observer)，stream则是被观察者(Observable)，其实就是[观察者模式(Observer Design Pattern)](https://en.wikipedia.org/wiki/Observer_pattern)。
 
 上面的示意图也可以使用ASCII重画为下图，在下面的部分教程中我们会使用这幅图：
 
@@ -55,9 +55,9 @@ X is an error
 ---> is the timeline
 ```
 
-既然已经开始对RP感到熟悉，为了不让你觉得无聊，我们可以尝试做一些新东西：我们将会把一个Click event stream转为新的Click event stream。
+既然已经开始对RP感到熟悉，为了不让你觉得无聊，我们可以尝试做一些新东西：我们将会把一个click event stream转为另一个的click event stream。
 
-首先，让我们做一个能记录一个按钮点击了多少次的计数器Stream。在常见的RP库中，每个Stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的Click stream返回一个 **新的Stream**。它不会对原来的Click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于RP Stream，就如果汁之于薄煎饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
+首先，让我们做一个能记录一个按钮被点击了多少次的计数器stream。在常见的RP库中，每个stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的click stream返回一个 **新的Stream**。它不会对原来的click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于RP Stream，就如果酱之于薄饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
 
 ```
   clickStream: ---c----c--c----c------c-->
@@ -67,29 +67,29 @@ X is an error
 counterStream: ---1----2--3----4------5-->
 ```
 
-`map(f)`会根据你提供的`f`函数把原Stream中的Value分别映射到新的Stream中。在我们的例子中，我们把每一次Click都映射为数字1。`scan(g)`会根据你提供的`g`函数把Stream中的所有Value聚合成一个Value -- `x = g(accumulated, current)`，这个示例中`g`只是一个简单的add函数。然后，每Click一次，`counterStream`就会把点击的总次数发给它的观察者。
+`map(f)`会根据你提供的`f`函数把原stream中的值分别映射到新的stream中。在我们的例子中，我们把每一次点击都映射为数字1。`scan(g)`会根据你提供的`g`函数把stream中的所有值聚合成一新的个值 -- `x = g(accumulated, current)`，这个示例中`g`只是一个简单的add函数。然后，每点击一次，`counterStream`就会把点击的总次数发给它的观察者。
 
-为了展示RP真正的实力，让我们假设你想得到一个包含双击事件的Stream。为了让它更加有趣，假设我们想要的这个Stream要同时考虑三击(Triple clicks)，或者更加宽泛，连击(Multiple clicks)。深呼吸一下，然后想像一下在传统的命令式且带状态的方式中你会怎么实现。我敢打赌代码会像一堆乱麻，并且会使用一些的变量保存状态，同时也有一些计算时间间隔的代码。
+为了展示RP真正的实力，让我们假设你想得到一个包含双击事件的stream。为了让它更加有趣，假设我们想要的这个stream要同时考虑三击(triple clicks)，或者更加宽泛，连击(multiple clicks)。深呼吸一下，然后想像一下在传统的命令式且带状态的方式中你会怎么实现。我敢打赌代码会像一堆乱麻，并且会使用一些的变量保存状态，同时也有一些计算时间间隔的代码。
 
 而在RP中，这个功能的实现就非常简单。事实上，这逻辑只有[4行代码](http://jsfiddle.net/staltz/4gGgs/27/)。但现在我们先不管那些代码。用图表的方式思考是理解怎样构建Stream的最好方法，无论你是初学者还是专家。
 
 ![Multiple clicks stream](http://i.imgur.com/HMGWNO5.png)
 
-灰色的方框是用来转换Stream的函数。首先，我们把时间间隔大于250ms的Click都放进一个列表(原文："First we accumulate clicks in lists, whenever 250 milliseconds of "event silence" has happened." ) -- 简单来说就是`buffer(stream.throttle(250ms))`做的事，不要在意这些细节，我们只是展示一下RP而已。结果是一个列表的Stream，然后我们使用`map()`把每个列表映射为一个整数，即它的长度。最终，我们使用`filter(x >= 2)`把整数`1`给过滤掉。就这样，3个操作就生成了我们想要的Stream。然后我们就可以订阅(监听)这个Stream，并以我们所希望的方式作出反应。
+灰色的方框是用来转换stream的函数。首先，我们把时间间隔大于250ms的Click都放进一个列表(原文："First we accumulate clicks in lists, whenever 250 milliseconds of "event silence" has happened." ) -- 简单来说就是`buffer(stream.throttle(250ms))`做的事，不要在意这些细节，我们只是展示一下RP而已。结果是一个列表的stream，然后我们使用`map()`把每个列表映射为一个整数，即它的长度。最终，我们使用`filter(x >= 2)`把整数`1`给过滤掉。就这样，3个操作就生成了我们想要的stream。然后我们就可以订阅(监听)这个stream，并以我们所希望的方式作出反应。
 
-我希望你能感受到这个示例的优美之处。这个示例只是冰山一角：你可以把同样的操作应用到不同种类的Stream上，例如，一个API响应的Stream；另一方面，还有很多其它可用的函数。
+我希望你能感受到这个示例的优美之处。这个示例只是冰山一角：你可以把同样的操作应用到不同种类的stream上，例如，一个API响应的stream；另外，RP还有很多其它可用的函数。
 
 ## 为什么我要使用RP
 
 RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑的那些相互依赖的事件，而非纠缠于大量的实现细节。RP的代码往往会更加简明。
 
-特别是在开发现在这些有着大量与Data events相关的UI events的高互动性Webapps、Mobile apps的时候，RP的优势将更加明显。10年前，网页的交互就只是提交一个很长的表单到后端，而前端只有简单的渲染。Apps就表现得更加的实时了：修改一个表单域就能自动地把修改后的值保存到后端，为一些内容"点赞"时，会实时的反应到其它在线用户那里等等。
+特别是在开发现在这些有着大量与Data events相关的UI events的高互动性Webapps、mobile apps的时候，RP的优势将更加明显。10年前，网页的交互就只是提交一个很长的表单到后端，而前端只有简单的渲染。Apps就表现得更加的实时了：修改一个表单域就能自动地把修改后的值保存到后端，为一些内容"点赞"时，会实时的反应到其它在线用户那里等等。
 
-现在的Apps有着大量各种各样的实时Events，以给用户提供一个交互性较高的体验。我们需要工具去应对这个变化，而RP就是一个答案。
+现在的Apps有着大量各种各样的实时events，以给用户提供一个交互性较高的体验。我们需要工具去应对这个变化，而RP就是一个答案。
 
 ## 以RP方式思考的例子
 
-下面让我们接触实实在在的代码。它来自真实的项目，不是虚构的例子，也没有只解释了一半的概念。一步一步地指导我们以RP的方式思考。学完教程之后，我们将写出真实可用的代码，并做到知其然，知其所以然。
+下面让我们接触实实在在的代码。它是一个可运行的，非虚构的例子，也没有只解释了一半的概念。它将一步一步地指导我们以RP的方式思考。学完教程之后，我们将写出真实可用的代码，并做到知其然，知其所以然。
 
 在这个教程中，我将会使用 **JavaScript** 和 **[RxJS](https://github.com/Reactive-Extensions/RxJS)**，因为JavaScript是现在最多人会的语言，而[Rx* 库](https://rx.codeplex.com/)有多种语言版本，并支持多种平台([.NET](https://rx.codeplex.com/), [Java](https://github.com/Netflix/RxJava), [Scala](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-scala), [Clojure](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-clojure),  [JavaScript](https://github.com/Reactive-Extensions/RxJS), [Ruby](https://github.com/Reactive-Extensions/Rx.rb), [Python](https://github.com/Reactive-Extensions/RxPy), [C++](https://github.com/Reactive-Extensions/RxCpp), [Objective-C/Cocoa](https://github.com/ReactiveCocoa/ReactiveCocoa), [Groovy](https://github.com/Netflix/RxJava/tree/master/language-adaptors/rxjava-groovy), 等等)。所以，无论你用的是什么语言、库，你都能从下面这个教程中学到东西。
 
