@@ -194,7 +194,7 @@ var responseMetastream = requestStream
 
 ![Response metastream](http://i.imgur.com/HHnmlac.png)
 
-Response的Metastream看起来会让人困惑，看起来也没有什么帮助。我们只想要一个简单的Response stream，它返回的Value应该是JSON而不是一个JSON对象的'Promise'。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，用来"flatten" Metastream。就是说，通过把作用在"trunk" Stream上的所有操作都应用到"branch" Stream上。Flatmap不是用来"fix" Metastream的，因为Metastream并不是一个Bug，这只是一些用来处理Rx中的异步响应(Asynchronous response)的工具。
+Response的Metastream看起来会让人困惑，看起来也没有什么帮助。我们只想要一个简单的response stream，它返回的Value应该是JSON而不是一个JSON对象的"Promise"。是时候介绍[Mr. Flatmap](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypeflatmapselector-resultselector)了：它是`map()`的一个版本，用来"flatten" Metastream。就是说，通过把作用在"trunk" stream上的所有操作都应用到"branch" stream上。Flatmap不是用来"fix" Metastream的，因为Metastream并不是一个bug，这只是一些用来处理Rx中的异步响应(asynchronous response)的工具。
 
 ```javascript
 var responseStream = requestStream
@@ -205,16 +205,16 @@ var responseStream = requestStream
 
 ![Response stream](http://i.imgur.com/Hi3zNzJ.png)
 
-很好。因为Response stream是根据Request stream定义的，所以**如果**我们后面在Request stream上发起更多的请求的话，在Response stream上我们将会得到相应的Response event，就像预期的那样：
+很好。因为response stream是根据request stream定义的，所以**如果**我们后面在request stream上发起更多的请求的话，在response stream上我们将会得到相应的response event，就像预期的那样：
 
 ```
 requestStream:  --a-----b--c------------|->
 responseStream: -----A--------B-----C---|->
 
-(小写字母是一个Request，大写字母是对应的Response)
+(小写字母是一个request，大写字母是对应的response)
 ```
 
-现在，我们终于有了一个Response stream，所以可以把收到的数据渲染出来了：
+现在，我们终于有了一个response stream，所以可以把收到的数据渲染出来了：
 
 ```javascript
 responseStream.subscribe(function(response) {
@@ -239,18 +239,18 @@ responseStream.subscribe(function(response) {
 
 ## Refresh按钮
 
-我之前并没有提到返回的JSON是一个有着100个用户数据的列表。因为这个API只允许我们设置偏移量(Offset)，而无法设置返回的用户数，所以我们现在是只用了3个用户的数据而浪费了另外97个的数据。这个问题暂时可以忽略，稍后我们会学习怎么缓存这些数据。
+我之前并没有提到返回的JSON是一个有着100个用户数据的列表。因为这个API只允许我们设置偏移量，而无法设置返回的用户数，所以我们现在是只用了3个用户的数据而浪费了另外97个的数据。这个问题暂时可以忽略，稍后我们会学习怎么缓存这些数据。
 
-每点击一次Refresh按钮，Request stream便应emit一个新的URL，这样我们就能得到一个新的Response。我们需要两样东西来达成这点要求：    
-1. 由Refresh按钮上Click events组成的Stream(咒语：一切皆Stream)；    
-2. Request stream也应该改为由Refresh click stream所生成的stream。幸运的是，RxJS提供了从Event listener生成Observable的函数。
+每点击一次refresh按钮，request stream便应emit一个新的URL，这样我们就能得到一个新的response。我们需要两样东西来达成这项需求：    
+1. 由refresh按钮上click events组成的stream(咒语：一切皆Stream)；    
+2. Request stream也应该改为由refresh click stream所生成的stream。幸运的是，RxJS提供了从event listener生成Observable的函数。
 
 ```javascript
 var refreshButton = document.querySelector('.refresh');
 var refreshClickStream = Rx.Observable.fromEvent(refreshButton, 'click');
 ```
 
-既然Refresh click event本身并没有提供任何要请求的API URL，我们需要把每一次的Click都映射为一个URL。现在，我们把Refresh click stream映射为新的Request stream，其中每一个Click都分别映射为对API请求一个随机偏移量的URL。
+既然refresh click event本身并没有提供任何要请求的API URL，我们需要把每一次的点击都映射为一个URL。现在，我们把refresh click stream映射为新的request stream，其中每一次点击都分别映射为对API endpoint请求一个随机的偏移量。
 
 ```javascript
 var requestStream = refreshClickStream
@@ -260,9 +260,9 @@ var requestStream = refreshClickStream
   });
 ```
 
-因为我比较笨并且也没有使用自动化测试，所以我刚把之前做好的一个特性搞烂了。现在在启动时不会再发出任何的Request，而只有在点击Refresh按钮时才会。额...但是这两个行为我都需要：无论是点击Refresh按钮时还是刚打开页面时都该发出一个Request。
+因为我比较笨并且也没有使用自动化测试，所以我刚把之前做好的一个特性搞烂了。现在在启动时不会再发出任何的request，而只有在点击refresh按钮时才会。额...但是这两个需求我都必须满足：无论是点击refresh按钮时还是刚打开页面时都该发出一个request。
 
-我们知道怎么分别为这两种情况生成Stream：
+我们知道怎么分别为这两种情况生成stream：
 
 ```javascript
 var requestOnRefreshStream = refreshClickStream
@@ -321,7 +321,7 @@ var requestStream = refreshClickStream
   .startWith('https://api.github.com/users');
 ```
 
-[`startWith()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypestartwithscheduler-args)函数做的事和你预期的完全一样。无论你输入的Stream是怎样，`startWith(x)`输出的Stream一开始都是`x`。但是还不够[DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself)，我重复了API URL。一个改进的方法是移掉`refreshClickStream`最后的`startWith()`，并在一开始的时候"模拟"点击一次refresh按钮。
+[`startWith()`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypestartwithscheduler-args)函数做的事和你预期的完全一样。无论你输入的怎样的stream，`startWith(x)`输出的stream一开始都是`x`。但是还不够[DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself)，我重复了API URL。一个改进的方法是移掉`refreshClickStream`最后的`startWith()`，并在一开始的时候模拟点击一次refresh按钮。
 
 ```javascript
 var requestStream = refreshClickStream.startWith('startup click')
@@ -333,9 +333,9 @@ var requestStream = refreshClickStream.startWith('startup click')
 
 很好。如果你把之前我"搞烂了的版本"的代码和现在的相比，就会发现唯一的不同是加了`startWith()`函数。
 
-## 用Stream构建三个推荐
+## 用stream构建三个推荐
 
-到现在为止，我们只是谈及了这个 _推荐_ UI元素在responeStream的`subscribe()`内执行的渲染步骤。对于Refresh按钮，我们还有一个问题：当你点击`Refresh`时，当前存在的三个推荐并不会被清除。新的推荐会在Response到达后出现，为了让UI看起来舒服一些，当点击刷新时，我们需要清理掉当前的推荐。
+到现在为止，我们只是谈及了这个 _推荐_ UI元素在responeStream的`subscribe()`内执行的渲染步骤。对于refresh按钮，我们还有一个问题：当你点击`refresh`时，当前存在的三个推荐并不会被清除。新的推荐会在response到达后出现，为了让UI看起来舒服一些，当点击刷新时，我们需要清理掉当前的推荐。
 
 ```javascript
 refreshClickStream.subscribe(function() {
@@ -343,7 +343,7 @@ refreshClickStream.subscribe(function() {
 });
 ```
 
-不，别那么快，朋友。这样不好，我们现在有 **两个** Subscriber会影响到推荐的DOM元素(另外一个是`responseStream.subscribe()`)，而且这样完全不符合[Separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)。还记得RP的咒语么？
+不，别那么快，朋友。这样不好，我们现在有 **两个** subscriber会影响到推荐的DOM元素(另外一个是`responseStream.subscribe()`)，而且这样完全不符合[Separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)。还记得RP的咒语么？
 
 &nbsp;
 &nbsp;
@@ -352,7 +352,7 @@ refreshClickStream.subscribe(function() {
 
 ![Mantra](http://i.imgur.com/AIimQ8C.jpg)
 
-所以让我们把一条推荐设计成emit的value为一条推荐内容的JSON对象的Stream。其余的两条推荐，我们也以同样的方法处理。第一条推荐现在看起来是这样的：
+所以让我们把一条推荐模型设计成emit的value为一条推荐内容的JSON对象的stream。其余的两条推荐，我们也以同样的方法处理。第一条推荐现在看起来是这样的：
 
 ```javascript
 var suggestion1Stream = responseStream
@@ -453,9 +453,9 @@ var requestStream = refreshClickStream.startWith('startup click')
   });
 ```
 
-以上这段代码并不能起作用。这将会关闭并且重新加载_所有_的推荐，而不是仅仅处理我们点击的那一个。有很多不同的方法可以解决这个问题。为了让这个问题有趣起来，我们可以通过复用之前的请求来解决它。API的Response有100个用户，而我们仅仅使用其中的三个，所以还有很多的新数据可以使用，无须重新发起请求。
+以上这段代码并不能起作用。这将会关闭并且重新加载_所有_的推荐，而不是仅仅处理我们点击的那一个。有多种不同的方法可以解决这个问题。为了让这个问题有趣起来，我们可以通过复用之前的请求来解决它。API返回的response中有100个用户，而我们仅仅使用了其中的3个，所以还有很多的新数据可以使用，无须重新发起请求。
 
-同样的，我们用Stream的方式来思考。当点击'close1'时，我们想要从responseStream _最近emit的_ Response列表中获取一个随机的用户，如：
+同样的，我们用stream的方式来思考。当点击'close1'时，我们想要从responseStream _最近emit的_ response列表中获取一个随机的用户，如：
 
 ```
     requestStream: --r--------------->
@@ -464,7 +464,7 @@ close1ClickStream: ------------c----->
 suggestion1Stream: ------s-----s----->
 ```
 
-在Rx*中，[`combineLatest`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypecombinelatestargs-resultselector)似乎实现了我们想要的功能。它接受两个Stream作为输入（Stream A和Stream B），当其中一个Stream emit一个value时，`combineLatest`便把最近两个emit的value`a`和`b`从各自的Stream中取出并且返回一个`c = f(a,b)`，`f`为你定义的函数。用图来表示便更加清晰了：
+在Rx*中，[`combineLatest`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypecombinelatestargs-resultselector)似乎实现了我们想要的功能。它接受两个stream作为输入（stream A和stream B），当其中一个stream emit一个value时，`combineLatest`便把最近两个emit的value`a`和`b`从各自的Stream中取出并且返回一个`c = f(a,b)`，`f`为你定义的函数。用图来表示便更加清晰了：
 
 ```
 stream A: --a-----------e--------i-------->
@@ -475,7 +475,7 @@ stream B: -----b----c--------d-------q---->
 f是把输入字符转化成大写字母的函数
 ```
 
-我们可以在`close1ClickStream`和`responseStream`上使用combineLatest()，所以无论什么时候当一个按钮被点击时，我们可以拿到Response最新emit的value，并且在`suggestion1Stream`上产生一个新的value。另一方面，combineLatest()是对称的，当一个新的Response 在`responseStream` emit时，它将会把最后的'close1'的点击事件一起合并来产生一个新的推荐。这是有趣的，因为它允许我们把之前的`suggestion1Stream`代码简化成下边这个样子：
+我们可以在`close1ClickStream`和`responseStream`上使用combineLatest()。无论什么时候当一个按钮被点击时，我们可以拿到response最新emit的value，并且在`suggestion1Stream`上产生一个新的value。另一方面，combineLatest()是对称的，当一个新的response 在`responseStream` emit时，它将会把最后的'close1'的点击事件一起合并来产生一个新的推荐。这是有趣的，因为它允许我们把之前的`suggestion1Stream`代码简化成下边这个样子：
 
 ```javascript
 var suggestion1Stream = close1ClickStream
@@ -490,7 +490,7 @@ var suggestion1Stream = close1ClickStream
   .startWith(null);
 ```
 
-还有一个问题需要解决。combineLatest()使用最近的两个数据源，但是当其中一个来源没发起任何事件时，combineLatest()无法在Output stream中产生一个Data event。从上边的ASCII图中，你可以看到，在第一个Stream emit `a`这个值时并没有任何输出产生，只有当第二个Stream emit `b`时才有值输出。
+还有一个问题需要解决。combineLatest()使用最近的两个数据源，但是当其中一个来源没发起任何事件时，combineLatest()无法在output stream中产生一个data event。从上边的ASCII图中，你可以看到，在第一个stream emit `a`这个值时并没有任何输出产生，只有当第二个stream emit `b`时才有值输出。
 
 有多种方法可以解决这个问题，我们选择最简单的一种，一开始在'close 1'按钮上模拟一个点击事件：
 
@@ -555,18 +555,18 @@ suggestion1Stream.subscribe(function(suggestion) {
 
 **你可以查看这个最终效果 http://jsfiddle.net/staltz/8jFJH/48/**
 
-这段代码虽然短小，但实现了不少功能：它适当的使用Separation of concerns实现了对Multiple events的管理，甚至缓存了响应。函数式的风格让代码看起来更加Declarative而非Imperative：我们并非给出一组指令去执行，而是通过定义Stream之间的关系 **定义这是什么**。举个例子，我们使用Rx告诉计算机 _`suggestion1Stream` **是** 由 'close 1' Stream与最新响应中的一个用户合并(combine)而来，在程序刚运行或者刷新时则是`null`_。
+这段代码虽然短小，但实现了不少功能：它适当的使用separation of concerns实现了对multiple events的管理，甚至缓存了响应。函数式的风格让代码看起来更加declarative而非imperative：我们并非给出一组指令去执行，而是通过定义stream之间的关系 **定义这是什么**。举个例子，我们使用Rx告诉计算机 _`suggestion1Stream` **是** 由 'close 1' Stream与最新响应中的一个用户合并(combine)而来，在程序刚运行或者刷新时则是`null`_。
 
-留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在Rx中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的Stream函数，甚至更多类似的函数去控制一个事件驱动(Event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
+留意一下代码中并没有出现如`if`、`for`、`while`这样的控制语句，或者一般JavaScript应用中典型的基于回调的控制流。如果你想使用`filter()`，上面的`subscribe()`中甚至可以不用`if`、`else`(实现细节留给读者作为练习)。在Rx中，我们有着像`map`、`filter`、`scan`、`merge`、`combineLatest`、`startWith`这样的stream函数，甚至更多类似的函数去控制一个事件驱动(event-driven)的程序。这个工具集让你可以用更少的代码实现更多的功能。
 
 ## 下一步
 
 如果你觉得Rx*会成为你首选的RP库，花点时间去熟悉这个[函数列表](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md)，包括了如何转换(transform)、合并(combine)、以及创建Observable。如果你想通过图表去理解这些函数，看一下这份[RxJava's very useful documentation with marble diagrams](https://github.com/Netflix/RxJava/wiki/Creating-Observables)。无论什么时候你遇到问题，画一下这些图，思考一下，看一下这一大串函数，然后继续思考。以我个人经验，这样效果很明显。
 
-一旦你开始使用Rx*去编程，很有必要去理解[Cold vs Hot Observables](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md#cold-vs-hot-observables)中的概念。如果忽略了这些，你一不小心就会被它坑了。我提醒过你了。通过学习真正的函数式编程(Funational programming)去提升自己的技能，并熟悉那些会影响到Rx*的问题，比如副作用(Side effect)。
+一旦你开始使用Rx*去编程，很有必要去理解[Cold vs Hot Observables](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md#cold-vs-hot-observables)中的概念。如果忽略了这些，你一不小心就会被它坑了。我提醒过你了。通过学习真正的函数式编程(Funational programming)去提升自己的技能，并熟悉那些会影响到Rx*的问题，比如副作用(side effect)。
 
 但是RP不仅仅有Rx*。还有相对容易理解的[Bacon.js](http://baconjs.github.io/)，它没有Rx*那些怪癖。[Elm Language](http://elm-lang.org/)则以它自己的方式支持RP：它是一门会编译成Javascript + HTML + CSS的FRP **语言**，并有一个[Time travelling debugger](http://debug.elm-lang.org/)。非常NB。
 
-Rx在需要处理大量事件的Frontend和Apps中非常有用。但它不仅仅能用在客户端，在Backend或者与Database交互时也非常有用。事实上，[RxJava是实现Netflix's API服务器端并发的一个重要组件](http://techblog.netflix.com/2013/02/rxjava-netflix-api.html)。Rx并不是一个只能在某种应用或者语言中使用的Framework。它本质上是一个在开发任何Event-driven软件中都能使用的编程范式(Paradigm)。
+Rx在需要处理大量事件的前端和Apps中非常有用。但它不仅仅能用在客户端，在后端或者与数据库交互时也非常有用。事实上，[RxJava是实现Netflix's API服务器端并发的一个重要组件](http://techblog.netflix.com/2013/02/rxjava-netflix-api.html)。Rx并不是一个只能在某种应用或者语言中使用的framework。它本质上是一个在开发任何event-driven软件中都能使用的编程范式(paradigm)。
 
 如果这份教程能帮到你，[请与更多人分享](https://twitter.com/intent/tweet?original_referer=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754%2F&amp;text=The%20introduction%20to%20Reactive%20Programming%20you%27ve%20been%20missing&amp;tw_p=tweetbutton&amp;url=https%3A%2F%2Fgist.github.com%2Fstaltz%2F868e7e9bc2a7b8c1f754&amp;via=andrestaltz)。
