@@ -57,7 +57,7 @@ X is an error
 
 既然已经开始对RP感到熟悉，为了不让你觉得无聊，我们可以尝试做一些新东西：我们将会把一个click event stream转为另一个的click event stream。
 
-首先，让我们做一个能记录一个按钮被点击了多少次的计数器stream。在常见的RP库中，每个stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的click stream返回一个 **新的Stream**。它不会对原来的click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于RP Stream，就如果酱之于薄饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
+首先，让我们做一个能记录一个按钮被点击了多少次的计数器stream。在常见的RP库中，每个stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的click stream返回一个 **新的stream**。它不会对原来的click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于RP stream，就如果酱之于薄饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
 
 ```
   clickStream: ---c----c--c----c------c-->
@@ -112,7 +112,7 @@ RP提高了代码的抽象层级，所以你可以只关注定义了业务逻辑
 
 ## Request与Response
 
-**在Rx中你该怎么处理这个问题呢？** 好吧，首先，(几乎)_所有的东西都可以转为一个Stream_。这就是Rx的咒语。让我们先从最简单的特性开始："在启动时，从API加载3个帐号的数据"。这并没有什么特别，就只是简单的3个步骤：    
+**在Rx中你该怎么处理这个问题呢？** 好吧，首先，(几乎)_所有的东西都可以转为一个stream_。这就是Rx的咒语。让我们先从最简单的特性开始："在启动时，从API加载3个帐号的数据"。这并没有什么特别，就只是简单的3个步骤：    
 1. 发出一个请求，    
 2. 收到一个响应，    
 3. 渲染这个响应。  
@@ -134,7 +134,7 @@ a是一个String 'https://api.github.com/users'
 var requestStream = Rx.Observable.just('https://api.github.com/users');
 ```
 
-但是现在，那只是一个由字符串组成的stream，并不会引起其他的操作。当这个value被emit的时候，我们需要以某种方式引起相关的操作。通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个Stream，便可以完成这个目的。
+但是现在，那只是一个由字符串组成的stream，并不会引起其他的操作。当这个value被emit的时候，我们需要以某种方式引起相关的操作。通过[订阅(Subscribing)](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted)这个stream，便可以完成这个目的。
 
 ```javascript
 requestStream.subscribe(function(requestUrl) {
@@ -179,7 +179,7 @@ Observable就是Promise++。在Rx中，你可以用`var stream = Rx.Observable.f
 
 这样非常不错，并展现了Observables至少有Promise那么强大。所以如果你相信Promise宣传的那些东西，那么也请留意一下Rx Observables能胜任些什么。
 
-现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在Rx内有简单的机制可以从其它Stream中转换并创建出新的Stream，所以我们也应该这样做。
+现在回到我们的例子，如果你已经注意到了我们在`subscribe()`内又调用了另外一个`subscribe()`，这类似于Callback hell。同样，你应该也注意到`responseStream`是建立在`requestStream`之上的。就像你之前了解到的那样，在Rx内有简单的机制可以从其它Stream中转换并创建出新的stream，所以我们也应该这样做。
 
 你现在需要知道的一个基本的函数是[`map(f)`](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypemapselector-thisarg)，它分别把`f()`应用到stream A中的每一个value，并把返回的value放进stream B里。如果我们也对request stream与response stream进行同样的处理，我们可以把request URL映射为response Promise(而Promise可以转为Streams)。
 
@@ -242,7 +242,7 @@ responseStream.subscribe(function(response) {
 我之前并没有提到返回的JSON是一个有着100个用户数据的列表。因为这个API只允许我们设置偏移量，而无法设置返回的用户数，所以我们现在是只用了3个用户的数据而浪费了另外97个的数据。这个问题暂时可以忽略，稍后我们会学习怎么缓存这些数据。
 
 每点击一次refresh按钮，request stream便应emit一个新的URL，这样我们就能得到一个新的response。我们需要两样东西来达成这项需求：    
-1. 由refresh按钮上click events组成的stream(咒语：一切皆Stream)；    
+1. 由refresh按钮上click events组成的stream(咒语：一切皆stream)；    
 2. Request stream也应该改为由refresh click stream所生成的stream。幸运的是，RxJS提供了从event listener生成Observable的函数。
 
 ```javascript
