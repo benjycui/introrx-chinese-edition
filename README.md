@@ -362,7 +362,7 @@ var suggestion1Stream = responseStream
   });
 ```
 
-其他的，`suggestion2Stream`和`suggestion3Stream`可以简单的拷贝`suggestion·Stream`的代码来使用。这不是DRY，它会让我们的例子变得更加简单一些，加之我觉得这是一个可以帮助考虑如何减少重复的良好实践。
+对于`suggestion2Stream`和`suggestion3Stream`，我们可以简单地拷贝`suggestion·Stream`的代码来使用。这不是DRY，但是它会让我们的例子变得更加简单一些。而且我觉得这是一个良好实践，它让我们思考如何去减少重复代码。
 
 我们不在responseStream的subscribe()中处理渲染了，我们这么处理：
 
