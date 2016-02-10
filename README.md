@@ -352,7 +352,7 @@ refreshClickStream.subscribe(function() {
 
 ![Mantra](http://i.imgur.com/AIimQ8C.jpg)
 
-所以让我们把显示的推荐设计成emit的值为一个包含了推荐内容的JSON对象的Stream。我们以此把三个推荐内容分开来。现在第一个推荐看起来是这样子的：
+所以让我们把一条推荐设计成emit的值为一条推荐内容的JSON对象的Stream。其余的两条推荐，我们也以同样的方法处理。第一条推荐现在看起来是这样的：
 
 ```javascript
 var suggestion1Stream = responseStream
