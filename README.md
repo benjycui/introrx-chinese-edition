@@ -475,7 +475,7 @@ stream B: -----b----c--------d-------q---->
 f是把值转化成大写字母的函数
 ```
 
-我们可以在`close1ClickStream`和`responseStream`上使用combineLatest()，所以无论什么时候当一个按钮被点击时，我们可以拿到Response最新emit的值，并且在`suggestion1Stream`上产生一个新的值。另一方面，combineLatest()是对称的，当一个新的Response 在`responseStream` emit时，它将会把最后的'关闭 1'的点击事件一起合并来产生一个新的推荐。这是有趣的，因为它允许我们把之前的`suggestion1Stream`代码简化成下边这个样子：
+我们可以在`close1ClickStream`和`responseStream`上使用combineLatest()，所以无论什么时候当一个按钮被点击时，我们可以拿到Response最新emit的值，并且在`suggestion1Stream`上产生一个新的值。另一方面，combineLatest()是对称的，当一个新的Response 在`responseStream` emit时，它将会把最后的'close1'的点击事件一起合并来产生一个新的推荐。这是有趣的，因为它允许我们把之前的`suggestion1Stream`代码简化成下边这个样子：
 
 ```javascript
 var suggestion1Stream = close1ClickStream
