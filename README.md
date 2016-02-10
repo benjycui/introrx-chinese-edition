@@ -40,7 +40,7 @@
 
 ![Click event stream](http://i.imgur.com/cL4MOsS.png)
 
-Stream就是一个 **按时间排序的Events(Ongoing events ordered in time)序列** ，它可以emit三种不同的Events：(某种类型的)Value、Error或者一个"Completed" Signal。考虑一下"Completed"发生的时机，例如，当包含这个Button(指上面Clicks on a button"例子中的Button)的Window或者View被关闭时。
+Stream就是一个 **按时间排序的Events(Ongoing events ordered in time)序列** ，它可以emit三种不同的Events：(某种类型的)Value、Error或者一个"Completed" 的信号。考虑一下"Completed"发生的时机，例如，当包含这个Button(指上面Clicks on a button"例子中的Button)的Window或者View被关闭时。
 
 通过分别为Value、Error、"Completed"定义事件处理函数，我们将会异步地捕获这些Events。有时可以忽略Error与"Completed"，你只需要定义Value的事件处理函数就行。监听一个Stream也被称作是 **订阅(Subscribing)**，而我们所定义的函数就是观察者(Observer)，Stream则是被观察者(Observable)，其实就是[观察者模式(Observer Design Pattern)](https://en.wikipedia.org/wiki/Observer_pattern)。
 
