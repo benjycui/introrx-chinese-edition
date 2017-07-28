@@ -57,7 +57,7 @@ X is an error
 
 既然已经开始对RP感到熟悉，为了不让你觉得无聊，我们可以尝试做一些新东西：我们将会把一个Click event stream转为新的Click event stream。
 
-首先，让我们做一个能记录一个按钮点击了多少次的计数器Stream。在常见的RP库中，每个Stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的Click stream返回一个 **新的Stream**。它不会对原来的Click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于RP Stream，就如果汁之于薄煎饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
+首先，让我们做一个能记录一个按钮点击了多少次的计数器Stream。在常见的RP库中，每个Stream都会有多个方法，`map`、`filter`、`scan`等等。当你调用其中一个方法时，例如`clickStream.map(f)`，它就会基于原来的Click stream返回一个 **新的Stream**。它不会对原来的Click steam作任何修改。这个特性就是 **不可变性(Immutability)**，它之于RP Stream，就如糖浆之于薄煎饼。我们也可以对方法进行链式调用如`clickStream.map(f).scan(g)`：
 
 ```
   clickStream: ---c----c--c----c------c-->
